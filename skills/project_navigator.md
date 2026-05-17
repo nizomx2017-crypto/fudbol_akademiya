@@ -13,3 +13,5 @@ Loyihada qaysi papka qanday vazifa bajarishini tushunib oling. Noto'g'ri joyda k
 - 📂 `/tahlil` — Statistika va hisobotlar saqlanadigan joy.
 
 > **Qoida:** Agar sizga frontend bo'yicha vazifa berilsa, ushbu jarayonda aslo backend qismidagi (`/code/backend`) fayllarga tegmang, o'zgarish qilmang! O'zingizga ajratilgan hududda ishlang.
+8dewf8y9wj
+iuwe

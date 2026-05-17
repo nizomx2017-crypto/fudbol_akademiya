@@ -45,6 +45,7 @@
 #### Funksiyalar:
 - Coach: Baholash qilish
 - Student/Parent: Progress ko'rish
+dcijapofu0vp
 
 ---
 
