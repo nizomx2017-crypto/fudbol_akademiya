@@ -3,6 +3,9 @@
 Bu papkada Pharmacy Management System arxitektura qarorlari joylashadi.
 
 ## Decision Log
+dfcdsdvfvafv
+sdcsdv
+
 
 ### ADR-001: Database Selection
 **Date**: 2024-01-15  
