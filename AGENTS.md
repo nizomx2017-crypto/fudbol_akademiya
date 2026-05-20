@@ -31,4 +31,7 @@ duiachapf
 
 ### `/tahlil/`
 - **Purpose**: Data analysis va reporting
-- **Content**: Statistikalar, hisobotlar, benchmark
+- **Content**: Statistikalar, hisobotlar, benchishlarni 
+
+senior dasturchi dsifatida bajargin
+
