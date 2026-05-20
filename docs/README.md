@@ -1,5 +1,7 @@
 # Docs - Hujjatlar
 
+# Alisherga salom
+
 Bu papkada futbol akademiyasi tizimi uchun hujjatlar joylashgan.
 
 ## 📄 Hujjatlar Ro'yxati
