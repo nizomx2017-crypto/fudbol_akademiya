@@ -22,8 +22,10 @@ Yosh futbolchilar rivojlanishini to'liq avtomatlashtiruvchi boshqaruv tizimi yar
 - **backlog/** - Bajarilishi kerak bo'lgan vazifalar
 - **in-progress/** - Hozirgi vazifalar
 - **done/** - Tugallangan vazifalar
-- **_template.md** - Standart vazifa formati
-duiachapf
+- **_template.md** - Standart vazifa forma
+
+- tartib bilan ishlagin
+- 
 
 ### `/skills/`
 - **Purpose**: Skill assessment va tracking
