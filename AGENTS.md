@@ -36,4 +36,6 @@ Yosh futbolchilar rivojlanishini to'liq avtomatlashtiruvchi boshqaruv tizimi yar
 - **Content**: Statistikalar, hisobotlar, benchishlarni 
 
 senior dasturchi dsifatida bajargin
+Salom men Alisher!
+
 
