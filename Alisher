@@ -1,0 +1,2 @@
+•	Oddiy Merge (Regular Merge): Ikkita tarmoqni (branch) boricha birlashtiradi. Har bir commit tarixi saqlanib qoladi. Tarix chalkash bo'lishi mumkin.
+•	Squash Merge: Tarmoqdagi barcha mayda commit-larni bitta katta commit-ga jamlaydi (siqadi). Asosiy tarmoq (main) tarixi toza va tushunarli bo'ladi.
