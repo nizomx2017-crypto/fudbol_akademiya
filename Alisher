@@ -1,2 +1,6 @@
 •	Oddiy Merge (Regular Merge): Ikkita tarmoqni (branch) boricha birlashtiradi. Har bir commit tarixi saqlanib qoladi. Tarix chalkash bo'lishi mumkin.
 •	Squash Merge: Tarmoqdagi barcha mayda commit-larni bitta katta commit-ga jamlaydi (siqadi). Asosiy tarmoq (main) tarixi toza va tushunarli bo'ladi.
+•	Fork: Birovning repozitoriyasidan nusxa olib, o'z profilingizga o'tkazish.
+•	Pull Request (PR): O'zgartirilgan kodni asosiy loyihaga qo'shish uchun yuborilgan so'rov.
+•	Issue Management: Loyihadagi xatolar (bug) va yangi funksiyalarni ro'yxatga olish tizimi.
+•	Organization: Jamoalar va ko'plab loyihalarni bir joyda boshqarish uchun guruh hisobi.
