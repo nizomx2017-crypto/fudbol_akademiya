@@ -1,0 +1,2 @@
+Salom men Nizom
+qalay
