@@ -2,3 +2,4 @@
 
 Bu github amaliyoti uchun yaratildi.
 test uchun
+test
