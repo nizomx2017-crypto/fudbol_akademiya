@@ -3,3 +3,5 @@
 Bu github amaliyoti uchun yaratildi.
 test uchun
 test
+master branch test
+
