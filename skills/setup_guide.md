@@ -1,39 +1,31 @@
-# 🛠️ Loyihani Ishga Tushirish Qo'llanmasi (Setup Guide)
+# muhit va ishga tushirish yo'riqnomasi
 
-Yangi dasturchi loyihani o'z kompyuterida ishga tushirishi uchun qisqa va tushunarli qadamlar:
+Bu fayl AI uchun muhit va ishga tushirish tafsilotlarini o'z ichiga oladi.
 
-## 1. Talab Qilinadigan Dasturlar
-- **Node.js**: `v18.x` yoki undan yuqori
-- **Paket menejeri**: `npm`
+## Talablar
+- Node.js v18.x yoki undan yuqori
+- npm paket menejeri
 
-## 2. Muhitni Sozlash (Environment Variables)
-Loyihani ishga tushirishdan oldin `.env` faylini to'g'irlash kerak.
-1. `/code/backend` va `/code/frontend` papkalariga kiring.
-2. Agar `.env.example` bo'lsa, undan nusxa olib, yangi `.env` faylini yarating.
-3. Kerakli API kalitlar va Database parollarini foydalanuvchidan so'rab kiriting (hech qachon shaxsiy parollarni yoddan o'ylab topmang).
+## Muhit o'zgaruvchilari
+- `/code/backend` va `/code/frontend` joylarda `.env` fayllari talab qilinishi mumkin.
+- Mavjud bo'lsa `.env.example` namunasi sifatida ishlating.
+- Aniq ko'rsatmasiz maxfiy ma'lumotlarni yaratish yoki to'ldirishning kerak emas.
 
-## 3. Loyihani Ishga Tushirish
-Har bir qism alohida terminalda ishga tushiriladi:
+## Ishga tushirish buyruqlari
+- Backend:
+  - `cd code/backend`
+  - `npm install`
+  - `npm run dev`
+- Frontend:
+  - `cd code/frontend`
+  - `npm install`
+  - `npm run dev`
+- Mobile:
+  - `cd code/mobile`
+  - `npm install`
+  - `npm start`
 
-**Backend (Server) uchun:**
-```bash
-cd code/backend
-npm install
-npm run dev
-```
+## Cheklovlar
+- Aniq topshiriqsiz hech narsani ishga tushirmang yoki o'rnatmang.
+- Muhit qiymatlarini taxmin qilmang; kerak bo'lsa foydalanuvchidan tekshirib oling.
 
-**Frontend (Web) uchun:**
-```bash
-cd code/frontend
-npm install
-npm run dev
-```
-
-**Mobile uchun:**
-```bash
-cd code/mobile
-npm install
-npm start
-```
-
-> **Eslatma:** Vazifa berilganda dasturni ishga tushirmasdan turib kod yozishni boshlamang. Avval joriy tizim ishlayotganiga ishonch hosil qiling!

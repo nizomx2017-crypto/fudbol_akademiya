@@ -1,17 +1,21 @@
-# 🛠️ Xatoliklarni Mustaqil Hal Qilish (Troubleshooting)
+# AI diagnostika yo'riqnomalari
 
-Ish jarayonida xatolik chiqsa vahimaga tushmang. Quyida eng ko'p uchrash ehtimoli bor xatolar va ularning yechimlari keltirilgan:
+Ushbu yo'riqnomalardan repository muammolarini aniqlaganda foydalaning.
 
-## 1. Port Band Xatosi (Port is already in use)
-- **Xatolik:** `EADDRINUSE: address already in use :::3000` (yoki boshqa raqam)
-- **Sababi va Yechim:** Sizda ushbu portda oldingi server o'chmay qolgan yoki boshqa dastur band qilyapti. Terminalda serverni majburan to'xtating (`Ctrl + C` bosib) yoki `.env` da boshqa port raqamini belgilang.
+## Xato kelib chiqishi
+- Xato `/code/backend`, `/code/frontend` yoki `/code/mobile` dan kelganini aniqlang.
+- Xatoning muhitga, qaramliklarga yoki kod mantiqiga bog'liq ekanini tasdiqlang.
 
-## 2. Kutubxona Topilmadi (Module not found)
-- **Xatolik:** `Error: Cannot find module 'express'` yoki shunga o'xshash nomlar.
-- **Sababi va Yechim:** Dasturga kerakli paketlar o'rnatilmagan. O'sha papkaning ichiga kirib (masalan `cd code/backend`), terminalda `npm install` komandasini yozib yuboring.
+## Umumiy holatlar
+- `EADDRINUSE` port to'qnashuvini anglatadi. Ishlayotgan jarayonlar va port konfiguratsiyasini tekshiring.
+- `Cannot find module` qaramliklar yetishmayotganini ko'rsatadi. Tegishli papkada o'rnatilganini tekshiring.
+- Ma'lumotlar bazasi ulanmasligi ko'pincha noto'g'ri yoki yo'q muhit o'zgaruvchilaridan keladi.
 
-## 3. Database ulanmadi (Connection Refused)
-- **Xatolik:** `MongoNetworkError` yoki baza ulanishini rad etishi.
-- **Sababi va Yechim:** `.env` fayli yo'q yoki ichidagi URL manzil xato. Parollar va URL manzilini tekshiring, mahalliy baza ishga tushganiga ishonch hosil qiling.
+## Yechim cheklovlari
+- Tasdiqlamasdan keng arxitektura o'zgarishi bilan hal qilmang.
+- Nomaqbul refaktor bilan xatolarni yashirmang.
+- Xato manbai aniq bo'lmasa, taxmin qilmay, aniqlik so'rang.
 
-> **Muhim Qoida:** O'zingiz umuman tushunmagan, mantiqsizdek ko'ringan katta xatolik (error) chiqsa, o'zboshimchalik bilan loyiha kodining asosiy arxitekturasini o'zgartirib xatoni yashirishga urinmang. Darhol foydalanuvchiga muammo sababini tushuntirib xabar bering.
+## O'zgarishlarni qayd etish
+- Asosiy sabab tuzatilganda muammo halini tegishli vazifa yoki changelogda qayd eting.
+

@@ -1,17 +1,15 @@
-# 🗺️ Loyiha Xaritasi (Project Navigator)
+# loyiha navigatori
 
-Loyihada qaysi papka qanday vazifa bajarishini tushunib oling. Noto'g'ri joyda kod yozmaslik uchun ushbu xaritaga tayanib ishlang:
+AI uchun repository katalog xaritasi.
 
-## Asosiy Papkalar Vazifasi:
+- `/code/backend`: Node.js API server, ma'lumotlar bazasi modellari, yo'nalishlar.
+- `/code/frontend`: React web ilovasi.
+- `/code/mobile`: React Native mobil ilovasi.
+- `/code/shared`: backend, frontend va mobile uchun umumiy util va tiplar.
+- `/docs`: texnik hujjatlar, arxitektura va rejalashtirish yozuvlari.
+- `/vazifalar`: vazifa boshqaruvi holatlari va progressni kuzatish.
+- `/tahlil`: tahlil, metrikalar va hisobotlar.
 
-- 📂 `/code/backend` — **API va Server.** Bu yerda faqat Node.js logikasi, database sxemalari va API yo'nalishlari yoziladi.
-- 📂 `/code/frontend` — **Web Ilova.** Foydalanuvchi ko'radigan interfeys (React). U backend orqali ma'lumotlarni tortib ekranga chiqaradi.
-- 📂 `/code/mobile` — **Mobil Ilova.** React Native yordamida yoziladigan Android va iOS dasturlari uchun papka.
-- 📂 `/code/shared` — Barcha loyihalar (back, front, mobile) birgalikda ishlatishi mumkin bo'lgan yordamchi kodlar va tiplar (types).
-- 📂 `/docs` — Loyihaning "**miya markazi**". Bu yerda texnik hujjatlar, arxitektura chizmalari turadi. Dastur kodi yozilmaydi.
-- 📂 `/vazifalar` — Vazifalarni boshqarish markazi. Bajarilishi kerak bo'lgan ishlar, jarayondagi ishlar va tugaganlar aynan shu yerdan kuzatiladi.
-- 📂 `/tahlil` — Statistika va hisobotlar saqlanadigan joy.
+Bu xaritadan o'zgarishlarni qayerga qo'llash va ijro etiluvchi kodni qayerga joylamaslikni aniqlash uchun foydalaning.
 
-> **Qoida:** Agar sizga frontend bo'yicha vazifa berilsa, ushbu jarayonda aslo backend qismidagi (`/code/backend`) fayllarga tegmang, o'zgarish qilmang! O'zingizga ajratilgan hududda ishlang.
-8dewf8y9wj
-iuwe
+

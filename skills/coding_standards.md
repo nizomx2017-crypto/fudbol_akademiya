@@ -1,19 +1,20 @@
-# 📝 Kod Yozish Standartlari (Coding Standards)
+# AI uchun kod yozish standartlari
 
-Loyiha toza va o'qishli bo'lishi uchun quyidagi kod yozish qoidalariga qat'iy amal qilinishi shart:
+Kerakli kod uslubi va tuzilmasini belgilaydi.
 
-## 1. Nomlash Qoidalari (Naming Conventions)
-- **O'zgaruvchilar va Funksiyalar**: Faqat `camelCase` ishlatiladi (masalan: `getUserData`, `playerScore`).
-- **Komponentlar (React/Mobile)**: `PascalCase` ishlatiladi (masalan: `PlayerCard.jsx`, `Header.tsx`).
-- **Fayl nomlari**:
-  - React/UI komponentlar uchun: `PascalCase.jsx` yoki `.tsx`
-  - Oddiy yordamchi funksiyalar (utils, xizmatlar): `camelCase.js` yoki `kebab-case.js`.
+## Noma
+- O'zgaruvchilar va funksiyalar: `camelCase`.
+- React va mobil komponentlar: `PascalCase`.
+- Fayl nomlari:
+  - Komponentlar: `PascalCase.jsx` / `.tsx`.
+  - Yordamchi va util modullar: `camelCase.js` yoki `kebab-case.js`.
 
-## 2. Kod Tozaligi (Clean Code)
-- Bitta funksiya faqat bitta aniq ishni bajarishi kerak. Funksiyani uzaytirib yubormang.
-- Yozilayotgan kod iloji boricha qayta ishlatilishi mumkin (reusable) bo'lishi kerak. Takrorlanuvchi kodlarni (copy-paste) yozmang.
-- Logika murakkab bo'lgan joylarga albatta qisqa va tushunarli **izohlar (comments)** qoldiring.
+## Tuzilish
+- Har bir funksiya bitta vazifani bajarishi kerak.
+- Takrorlangan kodlardan qoching; qayta ishlatiladigan modullarni ajrating.
+- Murakkab mantiq qisqa izohlar bilan hujjatlashtirilgan bo'lsin.
 
-## 3. Fayl va Ma'lumotlarni Ajratish
-- Logika (API zaproslar, hisob-kitoblar) va vizual interfeyslarni (UI) alohida fayllarda saqlang.
-- Katta kodni doim kichik, boshqarish oson bo'lgan bo'laklarga ajrating.
+## Ajratish
+- Biznes mantiqini UI renderidan ajrating.
+- Tegishli kodni kichik, yo'naltirilgan modullarda saqlang.
+
