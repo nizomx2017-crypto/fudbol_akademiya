@@ -4,37 +4,37 @@
 
 ### Bosqich 1: Asosiy Platforma (1-oy)
 **Rollar**: Admin, Student
-**Modullar**: Login, Profil, Guruh
+**Modullar**: Login, Profil, Kurs
 
 #### Nimalar kerak:
 - Login/Register
 - Admin panel
 - Student profil
-- Oddiy guruh yaratish
+- Oddiy kurs yaratish
 
 #### Funksiyalar:
-- Admin: Akademiya yaratish, guruh qo'shish
+- Admin: Markaz yaratish, kurs qo'shish
 - Student: Ro'yxatdan o'tish, profil ko'rish
 
 ---
 
-### Bosqich 2: Murabbiylik (2-oy)
-**Rollar**: Admin, Coach, Student
-**Modullar**: Guruhlar, Mashg'ulotlar
+### Bosqich 2: O'qituvchilik (2-oy)
+**Rollar**: Admin, Teacher, Student
+**Modullar**: Kurslar, Darslar
 
 #### Nimalar kerak:
-- Coach roli
-- Mashg'ulot jadvali
+- Teacher roli
+- Dars jadvali
 - Davomat
 
 #### Funksiyalar:
-- Coach: Guruhga tayinlash, mashg'ulotlar rejalashtirish
+- Teacher: Kursga tayinlash, darslar rejalashtirish
 - Student: Jadvalni ko'rish
 
 ---
 
 ### Bosqich 3: Progress (3-oy)
-**Rollar**: Admin, Coach, Student, Parent
+**Rollar**: Admin, Teacher, Student, Parent
 **Modullar**: Progress, Baholash
 
 #### Nimalar kerak:
@@ -43,9 +43,8 @@
 - Parent roli
 
 #### Funksiyalar:
-- Coach: Baholash qilish
+- Teacher: Baholash qilish
 - Student/Parent: Progress ko'rish
-dcijapofu0vp
 
 ---
 
@@ -66,14 +65,14 @@ dcijapofu0vp
 ## MVP Rollari (Soddalashtirilgan)
 
 ### 1. Admin
-- Akademiya yaratish
-- Guruhlar yaratish
-- Murabbiylarni qo'shish
+- Markaz yaratish
+- Kurslar yaratish
+- O'qituvchilarni qo'shish
 - To'lovlar
 
-### 2. Coach
-- O'z guruhlari
-- Mashg'ulotlar jadvali
+### 2. Teacher
+- O'z kurslari
+- Darslar jadvali
 - Davomat
 - Baholash
 
@@ -83,7 +82,7 @@ dcijapofu0vp
 - Progress
 
 ### 4. Parent
-- Bolasi profili
+- Farzand profili
 - Progress
 - To'lovlar
 
@@ -94,13 +93,13 @@ dcijapofu0vp
 - Role-based access
 - Profile management
 
-### 2. Group Management
-- Create groups
+### 2. Course Management
+- Create courses
 - Assign students
-- Assign coaches
+- Assign teachers
 
 ### 3. Schedule
-- Training sessions
+- Lesson sessions
 - Calendar view
 - Basic notifications
 
@@ -123,11 +122,11 @@ dcijapofu0vp
 
 ```sql
 users (id, email, password, name, role)
-academies (id, name, admin_id)
-groups (id, name, academy_id, coach_id)
-students (id, user_id, group_id)
-sessions (id, group_id, date, time)
-attendance (id, session_id, student_id, status)
+centers (id, name, admin_id)
+courses (id, name, center_id, teacher_id)
+students (id, user_id, course_id)
+lessons (id, course_id, date, time)
+attendance (id, lesson_id, student_id, status)
 progress (id, student_id, score, date)
 payments (id, student_id, amount, status)
 ```
@@ -142,13 +141,13 @@ payments (id, student_id, amount, status)
 
 ### Week 3-4: Core
 - [ ] Admin panel
-- [ ] Group management
+- [ ] Course management
 - [ ] User profiles
 
-### Week 5-6: Training
+### Week 5-6: Learning
 - [ ] Schedule system
 - [ ] Attendance
-- [ ] Coach functions
+- [ ] Teacher functions
 
 ### Week 7-8: Progress
 - [ ] Progress tracking
@@ -176,7 +175,7 @@ payments (id, student_id, amount, status)
 - Complex notifications
 
 ## MVP Success Metrics
-- 3 akademiya ishga tushishi
+- 3 markaz ishga tushishi
 - 100+ active student
 - 80% attendance tracking
 - 90% payment collection

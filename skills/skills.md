@@ -1,6 +1,6 @@
 # 🛡️ AI Agent va Dasturchilar uchun Loyiha Qoidalari va Chegaralar (Project Skills & Boundaries)
 
-Ushbu hujjat Football Academy loyihasiga qo'shilgan har qanday AI Agent yoki yangi dasturchi uchun **ENG BIRINCHI** o'qilishi kerak bo'lgan asosiy qo'llanmadir. Bu yerda sizning "skill"laringiz nimaligidan tashqari, loyihada nimalar qilish mumkin va nimalar qat'iyan man etilganligi (chegaralar) belgilangan.
+Ushbu hujjat o'quv markazi loyihasiga qo'shilgan har qanday AI Agent yoki yangi dasturchi uchun **ENG BIRINCHI** o'qilishi kerak bo'lgan asosiy qo'llanmadir. Bu yerda sizning "skill"laringiz nimaligidan tashqari, loyihada nimalar qilish mumkin va nimalar qat'iyan man etilganligi (chegaralar) belgilangan.
 
 ---
 
@@ -44,4 +44,4 @@ Sizning asosiy vazifangiz belgilangan reja doirasida toza va sifatli kod yozishd
 2. **Bajarish (Execution):** Tasdiqdan so'ng to'g'ridan-to'g'ri ishlashga kirishing.
 3. **Hisobot (Reporting):** Ish tugagach, nimalar o'zgargani, nima uchun aynan shunday qilingani va keyingi qadam nima bo'lishi mumkinligi haqida qisqacha ma'lumot bering.
 
-> **Xulosa:** Sizning "Skill"ingiz futbol qoidalari emas, balki **tartibli va xavfsiz kod yozish, loyiha chegaralarini hurmat qilish va berilgan reja doirasida tizimli ishlashdir!** Loyiha muhitida har bir fayl va papka o'z funksiyasiga ega. Uni buzmang!
+> **Xulosa:** Sizning "Skill"ingiz tartibli va xavfsiz kod yozish, loyiha chegaralarini hurmat qilish va berilgan reja doirasida tizimli ishlashdir! Loyiha muhitida har bir fayl va papka o'z funksiyasiga ega. Uni buzmang!

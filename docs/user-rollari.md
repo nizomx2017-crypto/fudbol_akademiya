@@ -1,4 +1,4 @@
-# Futbol Akademiyasi - User Rollari va Huquqlari
+# O'quv Markazi - User Rollari va Huquqlari
 
 ## Rollar
 
@@ -6,64 +6,64 @@
 - **Kim?**: Tizim egasi
 - **Nima qiladi?**: Butun tizimni boshqaradi
 - **Huquqlari**:
-  - Akademiyalarni yaratish/o'chirish
+  - Markazlarni yaratish/o'chirish
   - Barcha foydalanuvchilarni ko'rish
   - Tizim sozlamalari
   - Moliyaviy hisobotlar
 
-### 2. Academy Admin
-- **Kim?**: Akademiya direktori/menejeri
-- **Nima qiladi?**: O'z akademiyasini boshqaradi
+### 2. Center Admin
+- **Kim?**: Markaz direktori/menejeri
+- **Nima qiladi?**: O'z markazini boshqaradi
 - **Huquqlari**:
-  - Guruhlarni yaratish
-  - Murabbiylarni ishga olish
+  - Kurslarni yaratish
+  - O'qituvchilarni ishga olish
   - O'quvchilarni qabul qilish
   - To'lovlarni boshqarish
-  - O'z akademiyasi hisobotlari
+  - O'z markazi hisobotlari
 
-### 3. Coach (Murabbiy)
-- **Kim?**: Murabbiy
-- **Nima qiladi?**: Guruhlarga dars beradi
+### 3. Teacher (O'qituvchi)
+- **Kim?**: O'qituvchi
+- **Nima qiladi?**: Kurslarga dars beradi
 - **Huquqlari**:
-  - Mashg'ulotlar rejalashtirish
+  - Darslar rejalashtirish
   - Davomat belgilash
   - Baholash qilish
-  - O'z guruhlari progressi
+  - O'z kurslari progressi
   - O'quvchilarga vazifa berish
 
 ### 4. Student (O'quvchi)
-- **Kim?**: Futbolchi
-- **Nima qiladi?**: Mashg'ulotlarda qatnashadi
+- **Kim?**: Talaba
+- **Nima qiladi?**: Darslarda qatnashadi
 - **Huquqlari**:
   - O'z profilini ko'rish
   - Jadvalni ko'rish
   - O'z progressini ko'rish
-  - Mashg'ulotlarga yozilish
+  - Kurslarga yozilish
   - Vazifalarni ko'rish
 
 ### 5. Parent (Ota-ona)
 - **Kim?**: O'quvchi ota-onasi
-- **Nima qiladi?**: Bolasi progressini kuzatadi
+- **Nima qiladi?**: Farzandining o'qishini kuzatadi
 - **Huquqlari**:
-  - Bolasi profilini ko'rish
+  - Farzandining profilini ko'rish
   - Progress va statistika
   - To'lovlar tarixi
-  - Murabbiy bilan aloqa
+  - O'qituvchi bilan aloqa
   - Bildirishnomalarni olish
 
 ## Huquqlar Jadvali
 
-| Funksiya | Super Admin | Academy Admin | Coach | Student | Parent |
-|----------|-------------|---------------|-------|---------|--------|
-| Akademiya yaratish | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Guruh yaratish | ✅ | ✅ | ❌ | ❌ | ❌ |
-| Murabbiy tayinlash | ✅ | ✅ | ❌ | ❌ | ❌ |
-| Mashg'ulot rejalashtirish | ✅ | ✅ | ✅ | ❌ | ❌ |
+| Funksiya | Super Admin | Center Admin | Teacher | Student | Parent |
+|----------|-------------|--------------|---------|---------|--------|
+| Markaz yaratish | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Kurs yaratish | ✅ | ✅ | ❌ | ❌ | ❌ |
+| O'qituvchi tayinlash | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Dars rejalashtirish | ✅ | ✅ | ✅ | ❌ | ❌ |
 | Davomat belgilash | ✅ | ✅ | ✅ | ❌ | ❌ |
 | Baholash qilish | ✅ | ✅ | ✅ | ❌ | ❌ |
-| Progress ko'rish | ✅ | ✅ | ✅ | ✅ (o'zi) | ✅ (bolasi) |
+| Progress ko'rish | ✅ | ✅ | ✅ | ✅ (o'zi) | ✅ (farzandi) |
 | Jadval ko'rish | ✅ | ✅ | ✅ | ✅ | ✅ |
-| To'lovlar ko'rish | ✅ | ✅ (akademiya) | ❌ | ❌ | ✅ (bolasi) |
+| To'lovlar ko'rish | ✅ | ✅ (markaz) | ❌ | ❌ | ✅ (farzandi) |
 | Profil tahrirlash | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 ## Xavfsizlik Qatlamlari
@@ -73,14 +73,14 @@
 - Barcha ma'lumotlarni o'chirish
 - Tizimni to'xtatish
 
-### 2. Academy Level (Academy Admin)
-- Faqat o'z akademiyasi
+### 2. Center Level (Center Admin)
+- Faqat o'z markazi
 - O'z xodimlari va o'quvchilari
 - Moliyaviy ma'lumotlar
 
-### 3. Group Level (Coach)
-- Faqat o'z guruhlari
-- Mashg'ulotlar va progress
+### 3. Course Level (Teacher)
+- Faqat o'z kurslari
+- Darslar va progress
 - O'quvchi ma'lumotlari (cheklangan)
 
 ### 4. Individual Level (Student/Parent)
@@ -91,13 +91,13 @@
 ## Muhim Eslatmalar
 
 ### Privacy
-- Ota-ona faqat o'z bolasi ma'lumotlarini ko'radi
-- Murabbiy boshqa guruh ma'lumotlarini ko'rmaydi
-- Akademiya admin boshqa akademiya ma'lumotlarini ko'rmaydi
+- Ota-ona faqat farzandining ma'lumotlarini ko'radi
+- O'qituvchi boshqa kurs ma'lumotlarini ko'rmaydi
+- Center admin boshqa markaz ma'lumotlarini ko'rmaydi
 
 ### Huquq berish
 - Barcha rollar Super Admin tomonidan tasdiqlanadi
-- Academy Admin o'z akademiyasida murabbiy tayinlaydi
+- Center Admin o'z markazida o'qituvchi tayinlaydi
 - Huquqlar rolega bog'liq, individual emas
 
 ### Cheklovlar
@@ -107,7 +107,7 @@
 
 ## Oddiy Qoida
 - **Super Admin**: Hamma narsa
-- **Academy Admin**: O'z akademiyasi
-- **Coach**: O'z guruhlari  
+- **Center Admin**: O'z markazi
+- **Teacher**: O'z kurslari
 - **Student**: Faqat o'zi
-- **Parent**: Faqat bolasi
+- **Parent**: Faqat farzandi

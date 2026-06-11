@@ -1,18 +1,18 @@
 # Plan
 
-Futbol akademiyasi boshqaruv tizimi yosh futbolchilar rivojlanishini avtomatlashtiradi.
+O'quv markazi boshqaruv tizimi talabalarning o'qishini va markaz jarayonlarini avtomatlashtiradi.
 
 ## Texnik yechim
-Web platforma va mobil ilova orqali barcha jarayonlarni birlashtiradi.
+Web platforma va mobil ilova orqali barcha ta'lim jarayonlarini birlashtiradi.
 
 ## Foydalanuvchilar
-Admin, murabbiy, o'quvchi va ota-onalar uchun rolga asoslangan interfeys.
+Admin, o'qituvchi, o'quvchi va ota-onalar uchun rolga asoslangan interfeys.
 
 ## Asosiy funksiyalar
-Guruh boshqaruvi, mashg'ulotlar rejalashtirish, progress kuzatish va to'lovlar.
+Kurs boshqaruvi, darslar rejalashtirish, progress kuzatish va to'lovlar.
 
 ## Maqsad
-Qog'oz ishilarini yo'qotib, samaradorlikni oshirish va ota-onalar bilan aloqani yaxshilash.
+Qog'oz ishlarini kamaytirib, samaradorlikni oshirish va ota-onalar hamda o'qituvchilar bilan aloqani yaxshilash.
 
 ## Texnologiyalar
 Node.js backend, React frontend, PostgreSQL database, React Native mobil.
@@ -21,4 +21,4 @@ Node.js backend, React frontend, PostgreSQL database, React Native mobil.
 $75-100 ming dollar, 4 oy ichida MVP tayyorlanadi.
 
 ## Target
-O'zbekiston futbol akademiyalari va yoshlar sport maktablari.
+O'zbekiston o'quv markazlari va kurslari.

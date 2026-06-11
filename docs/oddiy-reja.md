@@ -1,13 +1,13 @@
-# Futbol Akademiyasi - Oddiy Reja
+# O'quv Markazi - Oddiy Reja
 
 ## Nima Kerak?
-Futbol akademiyasini boshqarish uchun oddiy dastur.
+O'quv markazini boshqarish uchun oddiy va samarali platforma.
 
 ## Kimlar Ishlatadi?
-- **Admin**: Akademiyani boshqaradi
-- **Murabbiy**: Guruhlarga dars beradi
-- **O'quvchi**: Mashg'ulotlarga qatnashadi
-- **Ota-ona**: Bolasi progressini ko'radi
+- **Admin**: Markaz faoliyatini boshqaradi
+- **O'qituvchi**: Kurs va darslarni olib boradi
+- **O'quvchi**: Darslarda qatnashadi
+- **Ota-ona**: Farzandining o'qishini kuzatadi
 
 ## Asosiy Funksiyalar
 
@@ -16,24 +16,24 @@ Futbol akademiyasini boshqarish uchun oddiy dastur.
 - Login qilish
 - Profil ko'rish
 
-### 2. Guruhlar
-- Guruh yaratish (U-8, U-10, h.k.)
-- O'quvchilarni guruhga qo'shish
-- Murabbiy tayinlash
+### 2. Kurslar
+- Kurs yaratish va boshqarish
+- O'quvchilarni kursga qo'shish
+- O'qituvchi tayinlash
 
-### 3. Mashg'ulotlar
-- Jadval yasash
+### 3. Darslar
+- Jadval yaratish
 - Davomat belgilash
-- Mashg'ulot haqida yozish
+- Dars haqida eslatmalar
 
 ### 4. Progress
-- Baholash (1-10 ball)
+- Baholash va ballar
 - Statistika ko'rsatish
 - Hisobotlar
 
 ### 5. To'lovlar
 - To'lov qabul qilish
-- Kontraktlar
+- Faktura va kvitansiyalar
 - Hisobotlar
 
 ## Texnologiya (oddiy)
@@ -47,22 +47,22 @@ Futbol akademiyasini boshqarish uchun oddiy dastur.
 ### 1-oy (Asosiy)
 - Login/registratsiya
 - Foydalanuvchi profillari
-- Akademiya yaratish
+- Markaz va kurs tuzilmasi
 
-### 2-oy (Guruhlar)
-- Guruhlar yaratish
+### 2-oy (Kurslar)
+- Kurslar yaratish
 - O'quvchilar qo'shish
-- Murabbiylar tayinlash
+- O'qituvchilarni tayinlash
 
-### 3-oy (Mashg'ulotlar)
-- Jadval yasash
+### 3-oy (Darslar)
+- Jadval yaratish
 - Davomat
-- Oddiy progress
+- Progress hisobotlari
 
 ### 4-oy (Mobil)
-- Iloqa qilish
-- Bildirishnomalar
-- Oddiy funksiyalar
+- Aloqa va bildirishnomalar
+- Kurs va darslar uchun mobil interfeys
+- Foydalanuvchi xabarnomalari
 
 ### 5-oy (To'lovlar)
 - To'lov tizimi
@@ -73,11 +73,11 @@ Futbol akademiyasini boshqarish uchun oddiy dastur.
 
 ```sql
 users (id, email, password, name, role)
-academies (id, name, address)
-groups (id, name, academy_id, coach_id)
-students (id, user_id, group_id)
-sessions (id, group_id, date, time)
-attendance (id, session_id, student_id, status)
+centers (id, name, address)
+courses (id, name, center_id, teacher_id)
+students (id, user_id, course_id)
+lessons (id, course_id, date, time)
+attendance (id, lesson_id, student_id, status)
 payments (id, student_id, amount, date)
 ```
 
@@ -94,11 +94,11 @@ payments (id, student_id, amount, date)
 
 ## Qisqa Reja
 1. Platformani qurish (2 oy)
-2. Guruhlarni qo'shish (1 oy)  
+2. Kurslarni qo'shish (1 oy)
 3. Mobil ilova (1 oy)
 4. To'lovlar va test (1 oy)
 5. Ishga tushirish
 
 ---
 
-Bu oddiy reja - katta tizim emas, asosiy funksiyalar bilan.
+Bu oddiy reja - kichik o'quv markazi uchun asosiy funksiyalar bilan.

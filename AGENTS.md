@@ -1,7 +1,7 @@
-# Football Academy - AI Agent Guidelines
+# O'quv Markazi - AI Agent Guidelines
 
 ## Project Goal
-Yosh futbolchilar rivojlanishini to'liq avtomatlashtiruvchi boshqaruv tizimi yaratish.
+Yosh talabalarning o'qishini to'liq avtomatlashtiruvchi boshqaruv tizimi yaratish.
 
 ## Directory Structure Purpose
 
@@ -35,5 +35,5 @@ Yosh futbolchilar rivojlanishini to'liq avtomatlashtiruvchi boshqaruv tizimi yar
 - **Purpose**: Data analysis va reporting
 - **Content**: Statistikalar, hisobotlar, benchishlarni 
 
-senior dasturchi dsifatida bajargin
+senior dasturchi sifatida bajaring
 

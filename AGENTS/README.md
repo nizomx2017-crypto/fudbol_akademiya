@@ -1,6 +1,6 @@
 # AI Agents
 
-Bu papkada Football Academy loyihasidagi AI agentlar haqida ma'lumotlar joylashadi.
+Bu papkada o'quv markazi loyihasidagi AI agentlar haqida ma'lumotlar joylashadi.
 
 ## Agentlar Tarkibi
 

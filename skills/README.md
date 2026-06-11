@@ -1,83 +1,83 @@
 # Skills
 
-Bu papkada futbol akademiyasi tizimidagi skill va ko'nikmalarni baholash, rivojlantirish va progress tracking uchun materiallar joylashadi.
+Bu papkada o'quv markazi tizimidagi skill va ko'nikmalarni baholash, rivojlantirish va progress tracking uchun materiallar joylashadi.
 
 ## Skill Assessment Framework
 
 ### Baholash Kategoriyalari
-- **Texnik ko'nikmalar**: Dribbling, passing, shooting, first touch, heading
-- **Fizik tayyorgarlik**: Speed, stamina, strength, agility, endurance
-- **Taktik tushuncha**: Positioning, decision making, teamwork, communication
-- **Psixologik holat**: Motivation, confidence, discipline, leadership
+- **Fan ko'nikmalari**: Matematika, til bilimlari, informatika, muloqot, ijodiy yozish
+- **O'qish odatlari**: Vaqtni boshqarish, konsentratsiya, intizom, motivatsiya, izchil o'qish
+- **Taktik o'quv strategiyalari**: Muammo hal qilish, mantiqiy fikrlash, jamoaviy ish, kommunikatsiya
+- **Psixologik holat**: Motivatsiya, ishonch, stressni boshqarish, yetakchilik
 
 ### Ball Tizimi
 - 1-10 ball shkalasi
-- Murabbiy bahosi
+- O'qituvchi bahosi
 - Avtomatik statistika
 - Progress grafiklari
 
 ## Progress Tracking
 
 ### Statistikalar
-- O'yin ko'rsatkichlari
-- Mashg'ulot samaradorligi
-- Yutuq va mag'lubiyatlar
+- Baholar va topshiriq natijalari
+- Dars qatnashuvi
+- Ichki test va imtihonlar
 - Individual progress
 
 ### Vizualizatsiya
 - Chartlar va grafiklar
 - Trend analizlari
-- Comparative reports
+- Taqqoslash hisobotlari
 - Performance dashboards
 
 ## Training Plans
 
 ### Individual Development
-- Personal mashg'ulot dasturlari
-- Skill improvement rejalari
-- Target-oriented mashqlar
-- Video namunalar
+- Shaxsiy ta'lim dasturlari
+- Fan bo'yicha rivojlanish rejalari
+- Maqsadga yo'naltirilgan topshiriqlar
+- O'quv materiallari va video namunalar
 
-### Team Development
+### Group Development
 - Guruh bo'yicha rejalash
-- Jamoaviy strategiyalar
-- Turnir tayyorgarliklari
-- Match analizlari
+- Jamoaviy o'rganish strategiyalari
+- Kurslar va seminarlar
+- O'qish natijalarini tahlil qilish
 
 ## Skill Development Resources
 
-### Mashqlar va Drills
-- Texnik mashqlar to'plami
-- Fizik tayyorgarlik mashqlari
-- Taktik mashg'ulotlar
-- Recovery mashqlari
+### Mashqlar va Vazifalar
+- Fan mashqlari to'plami
+- O'qish odatlari uchun resurslar
+- Loyihaviy topshiriqlar
+- Repetitorlik va qo'llab-quvvatlash
 
-### Video Analysis
-- Technique monitoring
-- Performance comparison
-- Highlight creation
-- Error identification
+### Data Analysis
+- O'qish natijalarini monitoring qilish
+- Progress taqqoslash
+- Natija tahlili
+- Xatolarni aniqlash
 
 ## Performance Metrics
 
 ### Individual Metrics
-- Skill level progression
-- Training consistency
-- Match performance
-- Physical fitness levels
+- Bilim darajasi rivoji
+- O'qish izchilligi
+- Test natijalari
+- O'qish faolligi
 
-### Team Metrics
-- Group performance
-- Team statistics
-- Ranking systems
-- Achievement tracking
+### Group Metrics
+- Kurs natijalari
+- Guruh samaradorligi
+- O'qish jarayonidagi yutuqlar
+- Yopilgan maqsadlar
 
 ## AI Integration
 
 ### Avtomatik Tavsiyalar
-- Personalized training plans
-- Skill gap identification
-- Performance predictions
+- Personalizatsiyalangan o'quv rejalari
+- Bilim bo'shliqlarini aniqlash
+- Progress bashoratlari
 - Injury risk assessment
 
 ### Progress Prognozlari
