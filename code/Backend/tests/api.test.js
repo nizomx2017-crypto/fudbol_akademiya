@@ -3,6 +3,8 @@ const assert = require("node:assert/strict");
 const { Client } = require("pg");
 require("dotenv").config();
 
+const AUTH_TOKEN = process.env.API_AUTH_TOKEN || "Alisher@123";
+
 let db;
 let server;
 let baseUrl;
@@ -35,11 +37,14 @@ async function ensureTestDatabase() {
 }
 
 async function request(path, options = {}) {
+  const headers = {
+    "content-type": "application/json",
+    ...(path.startsWith("/api") ? { Authorization: AUTH_TOKEN } : {}),
+    ...(options.headers || {}),
+  };
+
   const response = await fetch(`${baseUrl}${path}`, {
-    headers: {
-      "content-type": "application/json",
-      ...(options.headers || {}),
-    },
+    headers,
     ...options,
   });
 
@@ -103,6 +108,14 @@ describe("Backend API smoke tests", () => {
     const body = await request("/");
 
     assert.equal(body.message, "Backend ishlayapti");
+  });
+
+  it("blocks API requests without valid Authorization header", async () => {
+    const response = await fetch(`${baseUrl}/api/courses`);
+    const body = await response.json();
+
+    assert.equal(response.status, 401);
+    assert.equal(body.error, "Authorization xato yoki yuborilmagan");
   });
 
   it("supports Course CRUD", async () => {

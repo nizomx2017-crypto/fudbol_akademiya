@@ -8,6 +8,7 @@ const teacherRoutes = require("./routes/TeacherRoutes");
 const groupRoutes = require("./routes/GroupRoutes");
 const paymentRoutes = require("./routes/PaymentRoutes");
 const roomRoutes = require("./routes/RoomRoutes");
+const requireAuthorization = require("./middleware/auth");
 require("./models/associations");
 
 const app = express();
@@ -20,6 +21,8 @@ app.get("/", (req, res) => {
     message: "Backend ishlayapti",
   });
 });
+
+app.use("/api", requireAuthorization);
 
 app.use("/api/teachers", teacherRoutes);
 app.use("/api/groups", groupRoutes);
