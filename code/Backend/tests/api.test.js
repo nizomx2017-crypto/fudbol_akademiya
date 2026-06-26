@@ -3,11 +3,13 @@ const assert = require("node:assert/strict");
 const { Client } = require("pg");
 require("dotenv").config();
 
-const AUTH_TOKEN = process.env.API_AUTH_TOKEN || "Alisher@123";
+const LOGIN_PASSWORD = "test-login-password";
+process.env.LOGIN_PASSWORD = LOGIN_PASSWORD;
 
 let db;
 let server;
 let baseUrl;
+let authToken;
 
 async function ensureTestDatabase() {
   const defaultDbName = process.env.DB_NAME;
@@ -39,7 +41,7 @@ async function ensureTestDatabase() {
 async function request(path, options = {}) {
   const headers = {
     "content-type": "application/json",
-    ...(path.startsWith("/api") ? { Authorization: AUTH_TOKEN } : {}),
+    ...(path.startsWith("/api") ? { Authorization: authToken } : {}),
     ...(options.headers || {}),
   };
 
@@ -91,6 +93,16 @@ before(async () => {
 
   const { port } = server.address();
   baseUrl = `http://127.0.0.1:${port}`;
+
+  const loginResponse = await fetch(`${baseUrl}/auth/login`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({ password: LOGIN_PASSWORD }),
+  });
+  const loginBody = await loginResponse.json();
+  authToken = loginBody.token;
 });
 
 after(async () => {
@@ -116,6 +128,36 @@ describe("Backend API smoke tests", () => {
 
     assert.equal(response.status, 401);
     assert.equal(body.error, "Authorization xato yoki yuborilmagan");
+  });
+
+  it("blocks login with wrong password", async () => {
+    const response = await fetch(`${baseUrl}/auth/login`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ password: "wrong-password" }),
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 401);
+    assert.equal(body.error, "Parol xato");
+  });
+
+  it("returns API token after successful login", async () => {
+    const response = await fetch(`${baseUrl}/auth/login`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ password: LOGIN_PASSWORD }),
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(typeof body.token, "string");
+    assert.equal(body.token.length, 64);
+    assert.notEqual(body.token, LOGIN_PASSWORD);
   });
 
   it("supports Course CRUD", async () => {

@@ -1,13 +1,39 @@
 
 // All functions return Promises and follow REST conventions.
-const BASE_URL = "http://localhost:5000/api";
-const API_AUTH_TOKEN = import.meta.env.VITE_API_AUTH_TOKEN || "Alisher@123";
+const API_ORIGIN = "http://localhost:5000";
+const BASE_URL = `${API_ORIGIN}/api`;
+export const AUTH_TOKEN_STORAGE_KEY = "edu_center_api_token";
+
+export async function login(password) {
+  const res = await fetch(`${API_ORIGIN}/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ password }),
+  });
+
+  const body = await res.json();
+
+  if (!res.ok) {
+    throw new Error(body.error || `API ${res.status}: ${res.statusText}`);
+  }
+
+  sessionStorage.setItem(AUTH_TOKEN_STORAGE_KEY, body.token);
+  return body;
+}
 
 async function request(path, options = {}) {
+  const authToken = sessionStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
+
+  if (!authToken) {
+    throw new Error("Avval tizimga kiring");
+  }
+
   const res = await fetch(`${BASE_URL}${path}`, {
     headers: {
       "Content-Type": "application/json",
-      Authorization: API_AUTH_TOKEN,
+      Authorization: authToken,
       ...(options.headers || {}),
     },
     ...options,

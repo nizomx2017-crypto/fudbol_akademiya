@@ -8,6 +8,7 @@ const teacherRoutes = require("./routes/TeacherRoutes");
 const groupRoutes = require("./routes/GroupRoutes");
 const paymentRoutes = require("./routes/PaymentRoutes");
 const roomRoutes = require("./routes/RoomRoutes");
+const authRoutes = require("./routes/AuthRoutes");
 const requireAuthorization = require("./middleware/auth");
 require("./models/associations");
 
@@ -22,6 +23,7 @@ app.get("/", (req, res) => {
   });
 });
 
+app.use("/auth", authRoutes);
 app.use("/api", requireAuthorization);
 
 app.use("/api/teachers", teacherRoutes);
