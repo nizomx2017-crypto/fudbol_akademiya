@@ -1,10 +1,15 @@
 
 // All functions return Promises and follow REST conventions.
 const BASE_URL = "http://localhost:5000/api";
+const API_AUTH_TOKEN = import.meta.env.VITE_API_AUTH_TOKEN || "Alisher@123";
 
 async function request(path, options = {}) {
   const res = await fetch(`${BASE_URL}${path}`, {
-    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: API_AUTH_TOKEN,
+      ...(options.headers || {}),
+    },
     ...options,
     body: options.body ? JSON.stringify(options.body) : undefined,
   });
