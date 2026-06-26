@@ -3,19 +3,42 @@ const requireAuthorization = require("../middleware/auth");
 
 const router = express.Router();
 
-router.post("/login", (req, res) => {
-  const { password } = req.body;
-  const loginPassword = process.env.LOGIN_PASSWORD;
+function getLoginAccounts() {
+  const accounts = [];
 
-  if (!loginPassword) {
+  Object.keys(process.env)
+    .filter((key) => /^LOGIN_USER_\d+$/.test(key))
+    .map((key) => key.split("_").pop())
+    .sort((a, b) => Number(a) - Number(b))
+    .forEach((index) => {
+      const login = process.env[`LOGIN_USER_${index}`]?.trim();
+      const password = process.env[`LOGIN_PASSWORD_${index}`]?.trim();
+
+      if (login && password) {
+        accounts.push({ login, password });
+      }
+    });
+
+  return accounts;
+}
+
+router.post("/login", (req, res) => {
+  const { login, password } = req.body;
+  const loginAccounts = getLoginAccounts();
+
+  if (loginAccounts.length === 0) {
     return res.status(500).json({
-      error: "Login paroli sozlanmagan",
+      error: "Login sozlamalari kiritilmagan",
     });
   }
 
-  if (password !== loginPassword) {
+  const isValidAccount = loginAccounts.some(
+    (account) => account.login === login && account.password === password
+  );
+
+  if (!isValidAccount) {
     return res.status(401).json({
-      error: "Parol xato",
+      error: "Login yoki parol xato",
     });
   }
 

@@ -5,6 +5,7 @@ export default function AuthGate({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(
     () => Boolean(sessionStorage.getItem(AUTH_TOKEN_STORAGE_KEY))
   );
+  const [loginValue, setLoginValue] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -15,7 +16,7 @@ export default function AuthGate({ children }) {
     setError("");
 
     try {
-      await login(password);
+      await login({ login: loginValue, password });
       setIsAuthenticated(true);
     } catch (error) {
       setError(error.message);
@@ -35,13 +36,27 @@ export default function AuthGate({ children }) {
         <div className="auth-logo">O</div>
         <div>
           <h1 className="auth-title">O'quv Markazi</h1>
-          <p className="auth-subtitle">Tizimga kirish uchun parolni kiriting</p>
+          <p className="auth-subtitle">Tizimga kirish uchun login va parolni kiriting</p>
         </div>
+
+        <label className="auth-field">
+          <span>Login</span>
+          <input
+            autoFocus
+            value={loginValue}
+            type="text"
+            autoComplete="username"
+            onChange={(event) => {
+              setLoginValue(event.target.value);
+              setError("");
+            }}
+            disabled={isLoading}
+          />
+        </label>
 
         <label className="auth-field">
           <span>Parol</span>
           <input
-            autoFocus
             value={password}
             type="password"
             autoComplete="current-password"

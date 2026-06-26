@@ -3,8 +3,16 @@ const assert = require("node:assert/strict");
 const { Client } = require("pg");
 require("dotenv").config();
 
-const LOGIN_PASSWORD = "test-login-password";
-process.env.LOGIN_PASSWORD = LOGIN_PASSWORD;
+const LOGIN_ACCOUNTS = [
+  { login: "admin", password: "test-login-password" },
+  { login: "teacher", password: "second-test-password" },
+];
+process.env.LOGIN_PASSWORD = "";
+process.env.LOGIN_PASSWORDS = "";
+process.env.LOGIN_USER_1 = LOGIN_ACCOUNTS[0].login;
+process.env.LOGIN_PASSWORD_1 = LOGIN_ACCOUNTS[0].password;
+process.env.LOGIN_USER_2 = LOGIN_ACCOUNTS[1].login;
+process.env.LOGIN_PASSWORD_2 = LOGIN_ACCOUNTS[1].password;
 
 let db;
 let server;
@@ -99,7 +107,7 @@ before(async () => {
     headers: {
       "content-type": "application/json",
     },
-    body: JSON.stringify({ password: LOGIN_PASSWORD }),
+    body: JSON.stringify(LOGIN_ACCOUNTS[0]),
   });
   const loginBody = await loginResponse.json();
   authToken = loginBody.token;
@@ -130,18 +138,18 @@ describe("Backend API smoke tests", () => {
     assert.equal(body.error, "Authorization xato yoki yuborilmagan");
   });
 
-  it("blocks login with wrong password", async () => {
+  it("blocks login with wrong login or password", async () => {
     const response = await fetch(`${baseUrl}/auth/login`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
       },
-      body: JSON.stringify({ password: "wrong-password" }),
+      body: JSON.stringify({ login: "admin", password: "wrong-password" }),
     });
     const body = await response.json();
 
     assert.equal(response.status, 401);
-    assert.equal(body.error, "Parol xato");
+    assert.equal(body.error, "Login yoki parol xato");
   });
 
   it("returns API token after successful login", async () => {
@@ -150,14 +158,30 @@ describe("Backend API smoke tests", () => {
       headers: {
         "content-type": "application/json",
       },
-      body: JSON.stringify({ password: LOGIN_PASSWORD }),
+      body: JSON.stringify(LOGIN_ACCOUNTS[0]),
     });
     const body = await response.json();
 
     assert.equal(response.status, 200);
     assert.equal(typeof body.token, "string");
     assert.equal(body.token.length, 64);
-    assert.notEqual(body.token, LOGIN_PASSWORD);
+    assert.notEqual(body.token, LOGIN_ACCOUNTS[0].password);
+  });
+
+  it("returns API token for another configured account", async () => {
+    const response = await fetch(`${baseUrl}/auth/login`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(LOGIN_ACCOUNTS[1]),
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(typeof body.token, "string");
+    assert.equal(body.token.length, 64);
+    assert.notEqual(body.token, LOGIN_ACCOUNTS[1].password);
   });
 
   it("supports Course CRUD", async () => {

@@ -4,13 +4,13 @@ const API_ORIGIN = "http://localhost:5000";
 const BASE_URL = `${API_ORIGIN}/api`;
 export const AUTH_TOKEN_STORAGE_KEY = "edu_center_api_token";
 
-export async function login(password) {
+export async function login(credentials) {
   const res = await fetch(`${API_ORIGIN}/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ password }),
+    body: JSON.stringify(credentials),
   });
 
   const body = await res.json();
