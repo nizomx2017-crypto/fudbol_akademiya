@@ -2,6 +2,7 @@
 // All functions return Promises and follow REST conventions.
 const API_ORIGIN = "http://localhost:5000";
 const BASE_URL = `${API_ORIGIN}/api`;
+const AUTH_URL = `${API_ORIGIN}/auth`;
 export const AUTH_TOKEN_STORAGE_KEY = "edu_center_api_token";
 
 export async function login(credentials) {
@@ -43,6 +44,32 @@ async function request(path, options = {}) {
   return res.status === 204 ? null : res.json();
 }
 
+async function authRequest(path, options = {}) {
+  const authToken = sessionStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
+
+  if (!authToken) {
+    throw new Error("Avval tizimga kiring");
+  }
+
+  const res = await fetch(`${AUTH_URL}${path}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: authToken,
+      ...(options.headers || {}),
+    },
+    ...options,
+    body: options.body ? JSON.stringify(options.body) : undefined,
+  });
+
+  const body = res.status === 204 ? null : await res.json();
+
+  if (!res.ok) {
+    throw new Error(body?.error || `API ${res.status}: ${res.statusText}`);
+  }
+
+  return body;
+}
+
 function crud(resource) {
   return {
     list: () => request(`/${resource}`),
@@ -59,5 +86,11 @@ export const coursesApi = crud("courses");
 export const groupsApi = crud("groups");
 export const paymentsApi = crud("payments");
 export const roomsApi = crud("rooms");
+export const authUsersApi = {
+  list: () => authRequest("/users"),
+  create: (data) => authRequest("/users", { method: "POST", body: data }),
+  update: (id, data) => authRequest(`/users/${id}`, { method: "PUT", body: data }),
+  remove: (id) => authRequest(`/users/${id}`, { method: "DELETE" }),
+};
 
-export default { studentsApi, teachersApi, coursesApi, groupsApi, paymentsApi, roomsApi };
+export default { studentsApi, teachersApi, coursesApi, groupsApi, paymentsApi, roomsApi, authUsersApi };

@@ -47,9 +47,10 @@ async function ensureTestDatabase() {
 }
 
 async function request(path, options = {}) {
+  const needsAuthorization = path.startsWith("/api") || path.startsWith("/auth/users");
   const headers = {
     "content-type": "application/json",
-    ...(path.startsWith("/api") ? { Authorization: authToken } : {}),
+    ...(needsAuthorization ? { Authorization: authToken } : {}),
     ...(options.headers || {}),
   };
 
@@ -92,9 +93,11 @@ before(async () => {
   await ensureTestDatabase();
 
   const app = require("../app");
+  const seedAuthUsers = require("../models/seedAuthUsers");
   db = require("../config/db");
 
   await db.sync({ force: true });
+  await seedAuthUsers();
 
   server = app.listen(0);
   await new Promise((resolve) => server.once("listening", resolve));
@@ -166,6 +169,7 @@ describe("Backend API smoke tests", () => {
     assert.equal(typeof body.token, "string");
     assert.equal(body.token.length, 64);
     assert.notEqual(body.token, LOGIN_ACCOUNTS[0].password);
+    assert.equal(body.user.login, LOGIN_ACCOUNTS[0].login);
   });
 
   it("returns API token for another configured account", async () => {
@@ -182,6 +186,54 @@ describe("Backend API smoke tests", () => {
     assert.equal(typeof body.token, "string");
     assert.equal(body.token.length, 64);
     assert.notEqual(body.token, LOGIN_ACCOUNTS[1].password);
+    assert.equal(body.user.login, LOGIN_ACCOUNTS[1].login);
+  });
+
+  it("supports auth user management without exposing password hashes", async () => {
+    const users = await request("/auth/users");
+    assert.equal(users.length, 2);
+    assert.equal(users[0].passwordHash, undefined);
+
+    const created = await createRecord("/auth/users", {
+      login: "operator",
+      password: "operator-password",
+    });
+    assert.equal(created.login, "operator");
+    assert.equal(created.passwordHash, undefined);
+
+    const loginResponse = await fetch(`${baseUrl}/auth/login`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        login: "operator",
+        password: "operator-password",
+      }),
+    });
+    const loginBody = await loginResponse.json();
+    assert.equal(loginResponse.status, 200);
+    assert.equal(loginBody.user.login, "operator");
+
+    const updated = await updateRecord(`/auth/users/${created.id}`, {
+      password: "changed-password",
+    });
+    assert.equal(updated.login, "operator");
+
+    const oldPasswordResponse = await fetch(`${baseUrl}/auth/login`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        login: "operator",
+        password: "operator-password",
+      }),
+    });
+    assert.equal(oldPasswordResponse.status, 401);
+
+    const deleted = await deleteRecord(`/auth/users/${created.id}`);
+    assert.equal(deleted.message, "Auth user deleted");
   });
 
   it("supports Course CRUD", async () => {
