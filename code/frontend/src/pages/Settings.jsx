@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { KeyRound, Pencil, Plus, Save, Trash2, Users } from "lucide-react";
+import { KeyRound, Pencil, Plus, Trash2, Users } from "lucide-react";
 import Modal from "../components/Modal.jsx";
 import ConfirmDialog from "../components/ConfirmDialog.jsx";
 import { authUsersApi } from "../services/api.js";
@@ -164,7 +164,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="page">
+    <div className="page settings-page">
       {message && <div className="toast">{message}</div>}
 
       <div className="page-header">
@@ -172,7 +172,6 @@ export default function Settings() {
           <h1 className="page-title">Settings</h1>
           <p className="page-sub">Manage your center profile and preferences.</p>
         </div>
-        <button className="btn btn-primary"><Save /> Save changes</button>
       </div>
 
       {hasFullAccess ? (

@@ -32,6 +32,18 @@ router.post("/login", async (req, res) => {
         login,
         status: "active",
       },
+      include: [
+        {
+          model: UserAccess,
+          as: "userAccesses",
+          include: [
+            {
+              model: Access,
+              as: "access",
+            },
+          ],
+        },
+      ],
     });
 
     if (!user || !verifyPassword(password || "", user.passwordHash)) {

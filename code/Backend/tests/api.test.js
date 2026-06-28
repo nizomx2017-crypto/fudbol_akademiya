@@ -317,6 +317,10 @@ describe("Backend API smoke tests", () => {
       login: "teacher-default",
       password: "teacher-password",
     });
+    assert.deepEqual(
+      teacherLogin.user.accesses.sort(),
+      ["courses:view", "dashboard:view", "groups:view", "students:view", "teachers:view"].sort()
+    );
     const teacherCourses = await request("/api/courses", {
       token: teacherLogin.token,
     });
@@ -343,6 +347,15 @@ describe("Backend API smoke tests", () => {
     assert.equal(student.role, "STUDENT");
     assert.deepEqual(
       student.accesses.sort(),
+      ["courses:view", "dashboard:view", "groups:view"].sort()
+    );
+
+    const studentLogin = await login({
+      login: "student-default",
+      password: "student-password",
+    });
+    assert.deepEqual(
+      studentLogin.user.accesses.sort(),
       ["courses:view", "dashboard:view", "groups:view"].sort()
     );
   });
