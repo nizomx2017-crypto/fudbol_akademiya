@@ -9,7 +9,7 @@ const Role = db.define("roles", {
   },
 
   name: {
-    type: DataTypes.ENUM("ADMIN", "DIRECTOR", "MANAGER"),
+    type: DataTypes.ENUM("ADMIN", "DIRECTOR", "MANAGER", "TEACHER", "STUDENT"),
     allowNull: false,
     unique: true,
   },

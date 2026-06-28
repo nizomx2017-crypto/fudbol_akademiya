@@ -7,7 +7,7 @@ function hasAccess(user, access) {
     return true;
   }
 
-  return user?.role === "MANAGER" && user.accesses?.includes(access);
+  return Boolean(user?.accesses?.includes(access));
 }
 
 function requireAccess(access) {

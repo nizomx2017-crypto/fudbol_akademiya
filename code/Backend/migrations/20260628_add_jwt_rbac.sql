@@ -1,16 +1,21 @@
 DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_auth_users_role') THEN
-    CREATE TYPE enum_auth_users_role AS ENUM ('ADMIN', 'DIRECTOR', 'MANAGER');
+    CREATE TYPE enum_auth_users_role AS ENUM ('ADMIN', 'DIRECTOR', 'MANAGER', 'TEACHER', 'STUDENT');
   END IF;
 END $$;
 
 DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_roles_name') THEN
-    CREATE TYPE enum_roles_name AS ENUM ('ADMIN', 'DIRECTOR', 'MANAGER');
+    CREATE TYPE enum_roles_name AS ENUM ('ADMIN', 'DIRECTOR', 'MANAGER', 'TEACHER', 'STUDENT');
   END IF;
 END $$;
+
+ALTER TYPE enum_auth_users_role ADD VALUE IF NOT EXISTS 'TEACHER';
+ALTER TYPE enum_auth_users_role ADD VALUE IF NOT EXISTS 'STUDENT';
+ALTER TYPE enum_roles_name ADD VALUE IF NOT EXISTS 'TEACHER';
+ALTER TYPE enum_roles_name ADD VALUE IF NOT EXISTS 'STUDENT';
 
 ALTER TABLE auth_users
 ADD COLUMN IF NOT EXISTS role enum_auth_users_role NOT NULL DEFAULT 'MANAGER';
@@ -47,7 +52,9 @@ INSERT INTO roles (name, "createdAt", "updatedAt")
 VALUES
   ('ADMIN', NOW(), NOW()),
   ('DIRECTOR', NOW(), NOW()),
-  ('MANAGER', NOW(), NOW())
+  ('MANAGER', NOW(), NOW()),
+  ('TEACHER', NOW(), NOW()),
+  ('STUDENT', NOW(), NOW())
 ON CONFLICT (name) DO NOTHING;
 
 INSERT INTO accesses (name, resource, action, "createdAt", "updatedAt")

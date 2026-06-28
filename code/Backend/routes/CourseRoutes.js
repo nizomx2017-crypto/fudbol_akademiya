@@ -18,3 +18,4 @@ router.put("/:id", requireAccess("courses:update"), updateCourse);
 router.delete("/:id", requireAccess("courses:delete"), deleteCourse);
 
 module.exports = router;
+    

@@ -5,6 +5,24 @@ import ConfirmDialog from "../components/ConfirmDialog.jsx";
 import { authUsersApi } from "../services/api.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 
+const ACCESS_ROLES = ["MANAGER", "TEACHER", "STUDENT"];
+const ROLE_ACCESS_LABELS = {
+  MANAGER: "Manager accesslari",
+  TEACHER: "Teacher accesslari",
+  STUDENT: "Student accesslari",
+};
+const DEFAULT_ROLE_ACCESSES = {
+  MANAGER: [],
+  TEACHER: [
+    "dashboard:view",
+    "courses:view",
+    "groups:view",
+    "students:view",
+    "teachers:view",
+  ],
+  STUDENT: ["dashboard:view", "courses:view", "groups:view"],
+};
+
 export default function Settings() {
   const { hasFullAccess } = useAuth();
   const [prefs, setPrefs] = useState({
@@ -79,7 +97,7 @@ export default function Settings() {
       password: "",
       role: "MANAGER",
       status: "active",
-      accesses: [],
+      accesses: DEFAULT_ROLE_ACCESSES.MANAGER,
     });
     setEditingUser("new");
   }
@@ -101,7 +119,7 @@ export default function Settings() {
         login: userForm.login,
         role: userForm.role,
         status: userForm.status,
-        accesses: userForm.role === "MANAGER" ? userForm.accesses : [],
+        accesses: ACCESS_ROLES.includes(userForm.role) ? userForm.accesses : [],
       };
 
       if (userForm.password) {
@@ -206,7 +224,7 @@ export default function Settings() {
                         </span>
                       </td>
                       <td className="cell-dim">
-                        {user.role === "MANAGER" ? `${user.accesses?.length || 0} ta` : "Full access"}
+                        {ACCESS_ROLES.includes(user.role) ? `${user.accesses?.length || 0} ta` : "Full access"}
                       </td>
                       <td>
                         <div className="cell-actions">
@@ -289,13 +307,15 @@ export default function Settings() {
                 setUserForm({
                   ...userForm,
                   role: event.target.value,
-                  accesses: event.target.value === "MANAGER" ? userForm.accesses : [],
+                  accesses: DEFAULT_ROLE_ACCESSES[event.target.value] || [],
                 })
               }
             >
               <option value="ADMIN">ADMIN</option>
               <option value="DIRECTOR">DIRECTOR</option>
               <option value="MANAGER">MANAGER</option>
+              <option value="TEACHER">TEACHER</option>
+              <option value="STUDENT">STUDENT</option>
             </select>
           </div>
 
@@ -320,9 +340,9 @@ export default function Settings() {
             />
           </div>
 
-          {userForm.role === "MANAGER" ? (
+          {ACCESS_ROLES.includes(userForm.role) ? (
             <div className="field" style={{ gridColumn: "1 / -1" }}>
-              <label>Manager accesslari</label>
+              <label>{ROLE_ACCESS_LABELS[userForm.role]}</label>
               <div className="access-grid">
                 {accessCatalog.map((access) => (
                   <label className="access-check" key={access.name}>

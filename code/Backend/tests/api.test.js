@@ -300,6 +300,53 @@ describe("Backend API smoke tests", () => {
     assert.equal(stillDeniedResponse.status, 403);
   });
 
+  it("assigns default accesses for TEACHER and STUDENT roles", async () => {
+    const teacher = await createRecord("/auth/users", {
+      login: "teacher-default",
+      password: "teacher-password",
+      role: "TEACHER",
+    });
+
+    assert.equal(teacher.role, "TEACHER");
+    assert.deepEqual(
+      teacher.accesses.sort(),
+      ["courses:view", "dashboard:view", "groups:view", "students:view", "teachers:view"].sort()
+    );
+
+    const teacherLogin = await login({
+      login: "teacher-default",
+      password: "teacher-password",
+    });
+    const teacherCourses = await request("/api/courses", {
+      token: teacherLogin.token,
+    });
+    assert.ok(Array.isArray(teacherCourses));
+
+    const teacherCreateResponse = await fetch(`${baseUrl}/api/courses`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${teacherLogin.token}`,
+      },
+      body: JSON.stringify({
+        name: "Blocked Course",
+      }),
+    });
+    assert.equal(teacherCreateResponse.status, 403);
+
+    const student = await createRecord("/auth/users", {
+      login: "student-default",
+      password: "student-password",
+      role: "STUDENT",
+    });
+
+    assert.equal(student.role, "STUDENT");
+    assert.deepEqual(
+      student.accesses.sort(),
+      ["courses:view", "dashboard:view", "groups:view"].sort()
+    );
+  });
+
   it("supports Course CRUD", async () => {
     const course = await createRecord("/api/courses", {
       name: "Test Course",

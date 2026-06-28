@@ -6,6 +6,8 @@ const Access = require("../models/AccessModel");
 const UserAccess = require("../models/UserAccessModel");
 const { hashPassword, verifyPassword } = require("../utils/password");
 const { ACCESS_CATALOG } = require("../constants/accessCatalog");
+const { DEFAULT_ROLE_ACCESSES } = require("../constants/roleAccessDefaults");
+const ROLE_TYPES = ["ADMIN", "DIRECTOR", "MANAGER", "TEACHER", "STUDENT"];
 
 const router = express.Router();
 
@@ -76,7 +78,7 @@ router.get("/users", requireAuthorization, requireFullAccess, async (req, res) =
 });
 
 router.post("/users", requireAuthorization, requireFullAccess, async (req, res) => {
-  const { login, password, role = "MANAGER", status = "active", accesses = [] } = req.body;
+  const { login, password, role = "MANAGER", status = "active" } = req.body;
 
   try {
     if (!login || !password) {
@@ -85,7 +87,7 @@ router.post("/users", requireAuthorization, requireFullAccess, async (req, res) 
       });
     }
 
-    if (!["ADMIN", "DIRECTOR", "MANAGER"].includes(role)) {
+    if (!ROLE_TYPES.includes(role)) {
       return res.status(400).json({
         error: "Role noto'g'ri",
       });
@@ -98,8 +100,8 @@ router.post("/users", requireAuthorization, requireFullAccess, async (req, res) 
       status,
     });
 
-    if (role === "MANAGER" && Array.isArray(accesses)) {
-      await setUserAccesses(user.id, accesses);
+    if (!["ADMIN", "DIRECTOR"].includes(role)) {
+      await setUserAccesses(user.id, getRoleAccesses(role, req.body.accesses));
     }
 
     const createdUser = await findUserWithAccesses(user.id);
@@ -125,7 +127,7 @@ router.put("/users/:id", requireAuthorization, requireFullAccess, async (req, re
     if (login !== undefined) user.login = login;
     if (status !== undefined) user.status = status;
     if (role !== undefined) {
-      if (!["ADMIN", "DIRECTOR", "MANAGER"].includes(role)) {
+      if (!ROLE_TYPES.includes(role)) {
         return res.status(400).json({
           error: "Role noto'g'ri",
         });
@@ -138,7 +140,10 @@ router.put("/users/:id", requireAuthorization, requireFullAccess, async (req, re
     await user.save();
 
     if (Array.isArray(accesses)) {
-      await setUserAccesses(user.id, user.role === "MANAGER" ? accesses : []);
+      await setUserAccesses(
+        user.id,
+        ["ADMIN", "DIRECTOR"].includes(user.role) ? [] : accesses
+      );
     }
 
     const updatedUser = await findUserWithAccesses(user.id);
@@ -208,7 +213,7 @@ router.put("/users/:id/accesses", requireAuthorization, requireFullAccess, async
       });
     }
 
-    if (user.role !== "MANAGER") {
+    if (user.role === "ADMIN" || user.role === "DIRECTOR") {
       await UserAccess.destroy({ where: { userId: user.id } });
       const updatedUser = await findUserWithAccesses(user.id);
       return res.json(toPublicUser(updatedUser));
@@ -264,6 +269,14 @@ async function setUserAccesses(userId, accessNames) {
       })
     )
   );
+}
+
+function getRoleAccesses(role, accesses) {
+  if (Array.isArray(accesses)) {
+    return accesses;
+  }
+
+  return DEFAULT_ROLE_ACCESSES[role] || [];
 }
 
 module.exports = router;

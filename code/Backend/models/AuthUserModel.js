@@ -20,7 +20,7 @@ const AuthUser = db.define("auth_users", {
   },
 
   role: {
-    type: DataTypes.ENUM("ADMIN", "DIRECTOR", "MANAGER"),
+    type: DataTypes.ENUM("ADMIN", "DIRECTOR", "MANAGER", "TEACHER", "STUDENT"),
     allowNull: false,
     defaultValue: "MANAGER",
   },

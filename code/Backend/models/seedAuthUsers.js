@@ -4,7 +4,7 @@ const Access = require("./AccessModel");
 const { hashPassword } = require("../utils/password");
 const { ACCESS_CATALOG } = require("../constants/accessCatalog");
 
-const ROLES = ["ADMIN", "DIRECTOR", "MANAGER"];
+const ROLES = ["ADMIN", "DIRECTOR", "MANAGER", "TEACHER", "STUDENT"];
 
 function getSeedAccounts() {
   return Object.keys(process.env)
@@ -44,24 +44,34 @@ async function seedAuthUsers() {
     })
   );
 
-  const count = await AuthUser.count();
-
-  if (count > 0) {
-    return;
-  }
-
   const accounts = getSeedAccounts();
 
   await Promise.all(
-    accounts.map((account) =>
-      AuthUser.create({
+    accounts.map(async (account) => {
+      const role = ROLES.includes(account.role)
+        ? account.role
+        : "MANAGER";
+      const user = await AuthUser.findOne({
+        where: {
+          login: account.login,
+        },
+      });
+
+      if (user) {
+        user.passwordHash = hashPassword(account.password);
+        user.role = role;
+        user.status = "active";
+        await user.save();
+        return user;
+      }
+
+      return AuthUser.create({
         login: account.login,
         passwordHash: hashPassword(account.password),
-        role: ["ADMIN", "DIRECTOR", "MANAGER"].includes(account.role)
-          ? account.role
-          : "MANAGER",
-      })
-    )
+        role,
+        status: "active",
+      });
+    })
   );
 }
 
