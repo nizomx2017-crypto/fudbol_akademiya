@@ -3,6 +3,7 @@ import { studentsApi } from "../services/api.js";
 export default function Students() {
   return (
     <CrudPage
+      resource="students"
       title="Students"
       subtitle="Manage every learner enrolled in your center."
       api={studentsApi}

@@ -4,6 +4,7 @@ import { teachersApi } from "../services/api.js";
 export default function Teachers() {
   return (
     <CrudPage
+      resource="teachers"
       title="Teachers"
       subtitle="Your team of instructors and mentors."
       api={teachersApi}

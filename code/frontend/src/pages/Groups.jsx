@@ -4,6 +4,7 @@ import { groupsApi } from "../services/api.js";
 export default function Groups() {
   return (
     <CrudPage
+      resource="groups"
       title="Groups"
       subtitle="Active study groups and schedules."
       api={groupsApi}

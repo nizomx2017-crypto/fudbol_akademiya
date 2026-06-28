@@ -4,6 +4,7 @@ const API_ORIGIN = "http://localhost:5000";
 const BASE_URL = `${API_ORIGIN}/api`;
 const AUTH_URL = `${API_ORIGIN}/auth`;
 export const AUTH_TOKEN_STORAGE_KEY = "edu_center_api_token";
+export const AUTH_USER_STORAGE_KEY = "edu_center_auth_user";
 
 export async function login(credentials) {
   const res = await fetch(`${API_ORIGIN}/auth/login`, {
@@ -21,6 +22,7 @@ export async function login(credentials) {
   }
 
   sessionStorage.setItem(AUTH_TOKEN_STORAGE_KEY, body.token);
+  sessionStorage.setItem(AUTH_USER_STORAGE_KEY, JSON.stringify(body.user));
   return body;
 }
 
@@ -34,7 +36,7 @@ async function request(path, options = {}) {
   const res = await fetch(`${BASE_URL}${path}`, {
     headers: {
       "Content-Type": "application/json",
-      Authorization: authToken,
+      Authorization: `Bearer ${authToken}`,
       ...(options.headers || {}),
     },
     ...options,
@@ -54,7 +56,7 @@ async function authRequest(path, options = {}) {
   const res = await fetch(`${AUTH_URL}${path}`, {
     headers: {
       "Content-Type": "application/json",
-      Authorization: authToken,
+      Authorization: `Bearer ${authToken}`,
       ...(options.headers || {}),
     },
     ...options,
@@ -91,6 +93,10 @@ export const authUsersApi = {
   create: (data) => authRequest("/users", { method: "POST", body: data }),
   update: (id, data) => authRequest(`/users/${id}`, { method: "PUT", body: data }),
   remove: (id) => authRequest(`/users/${id}`, { method: "DELETE" }),
+  accesses: () => authRequest("/accesses"),
+  userAccesses: (id) => authRequest(`/users/${id}/accesses`),
+  setAccesses: (id, accesses) =>
+    authRequest(`/users/${id}/accesses`, { method: "PUT", body: { accesses } }),
 };
 
 export default { studentsApi, teachersApi, coursesApi, groupsApi, paymentsApi, roomsApi, authUsersApi };

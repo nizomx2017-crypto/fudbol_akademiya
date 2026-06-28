@@ -3,19 +3,23 @@ import {
   LayoutDashboard, Users, GraduationCap, BookOpen,
   Layers, CreditCard, DoorOpen, Settings, Sparkles
 } from "lucide-react";
+import { useAuth } from "../auth/AuthContext.jsx";
 
 const items = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/students", label: "Students", icon: Users },
-  { to: "/teachers", label: "Teachers", icon: GraduationCap },
-  { to: "/courses", label: "Courses", icon: BookOpen },
-  { to: "/groups", label: "Groups", icon: Layers },
-  { to: "/payments", label: "Payments", icon: CreditCard },
-  { to: "/rooms", label: "Rooms", icon: DoorOpen },
-  { to: "/settings", label: "Settings", icon: Settings },
+  { to: "/", label: "Dashboard", icon: LayoutDashboard, access: "dashboard:view" },
+  { to: "/students", label: "Students", icon: Users, access: "students:view" },
+  { to: "/teachers", label: "Teachers", icon: GraduationCap, access: "teachers:view" },
+  { to: "/courses", label: "Courses", icon: BookOpen, access: "courses:view" },
+  { to: "/groups", label: "Groups", icon: Layers, access: "groups:view" },
+  { to: "/payments", label: "Payments", icon: CreditCard, access: "payments:view" },
+  { to: "/rooms", label: "Rooms", icon: DoorOpen, access: "rooms:view" },
+  { to: "/settings", label: "Settings", icon: Settings, access: "settings:view" },
 ];
 
 export default function Sidebar({ open, onClose }) {
+  const { hasAccess } = useAuth();
+  const visibleItems = items.filter((item) => hasAccess(item.access));
+
   return (
     <aside className={`sidebar ${open ? "open" : ""}`}>
       <div className="brand">
@@ -27,7 +31,7 @@ export default function Sidebar({ open, onClose }) {
       </div>
 
       <div className="nav-label">Workspace</div>
-      {items.map((it) => (
+      {visibleItems.map((it) => (
         <NavLink
           key={it.to}
           to={it.to}

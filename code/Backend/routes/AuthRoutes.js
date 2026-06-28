@@ -1,7 +1,11 @@
 const express = require("express");
 const requireAuthorization = require("../middleware/auth");
+const { requireFullAccess } = require("../middleware/access");
 const AuthUser = require("../models/AuthUserModel");
+const Access = require("../models/AccessModel");
+const UserAccess = require("../models/UserAccessModel");
 const { hashPassword, verifyPassword } = require("../utils/password");
+const { ACCESS_CATALOG } = require("../constants/accessCatalog");
 
 const router = express.Router();
 
@@ -9,7 +13,9 @@ function toPublicUser(user) {
   return {
     id: user.id,
     login: user.login,
+    role: user.role,
     status: user.status,
+    accesses: user.userAccesses?.map((item) => item.access?.name).filter(Boolean) || [],
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   };
@@ -33,7 +39,7 @@ router.post("/login", async (req, res) => {
     }
 
     return res.json({
-      token: requireAuthorization.createSessionToken(),
+      token: requireAuthorization.createSessionToken(user),
       user: toPublicUser(user),
     });
   } catch (error) {
@@ -41,9 +47,25 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.get("/users", requireAuthorization, async (req, res) => {
+router.get("/me", requireAuthorization, async (req, res) => {
+  res.json({ user: req.user });
+});
+
+router.get("/users", requireAuthorization, requireFullAccess, async (req, res) => {
   try {
     const users = await AuthUser.findAll({
+      include: [
+        {
+          model: UserAccess,
+          as: "userAccesses",
+          include: [
+            {
+              model: Access,
+              as: "access",
+            },
+          ],
+        },
+      ],
       order: [["id", "ASC"]],
     });
 
@@ -53,8 +75,8 @@ router.get("/users", requireAuthorization, async (req, res) => {
   }
 });
 
-router.post("/users", requireAuthorization, async (req, res) => {
-  const { login, password, status = "active" } = req.body;
+router.post("/users", requireAuthorization, requireFullAccess, async (req, res) => {
+  const { login, password, role = "MANAGER", status = "active", accesses = [] } = req.body;
 
   try {
     if (!login || !password) {
@@ -63,21 +85,33 @@ router.post("/users", requireAuthorization, async (req, res) => {
       });
     }
 
+    if (!["ADMIN", "DIRECTOR", "MANAGER"].includes(role)) {
+      return res.status(400).json({
+        error: "Role noto'g'ri",
+      });
+    }
+
     const user = await AuthUser.create({
       login,
       passwordHash: hashPassword(password),
+      role,
       status,
     });
 
-    res.json(toPublicUser(user));
+    if (role === "MANAGER" && Array.isArray(accesses)) {
+      await setUserAccesses(user.id, accesses);
+    }
+
+    const createdUser = await findUserWithAccesses(user.id);
+    res.json(toPublicUser(createdUser));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.put("/users/:id", requireAuthorization, async (req, res) => {
+router.put("/users/:id", requireAuthorization, requireFullAccess, async (req, res) => {
   const { id } = req.params;
-  const { login, password, status } = req.body;
+  const { login, password, role, status, accesses } = req.body;
 
   try {
     const user = await AuthUser.findByPk(id);
@@ -90,17 +124,31 @@ router.put("/users/:id", requireAuthorization, async (req, res) => {
 
     if (login !== undefined) user.login = login;
     if (status !== undefined) user.status = status;
+    if (role !== undefined) {
+      if (!["ADMIN", "DIRECTOR", "MANAGER"].includes(role)) {
+        return res.status(400).json({
+          error: "Role noto'g'ri",
+        });
+      }
+
+      user.role = role;
+    }
     if (password) user.passwordHash = hashPassword(password);
 
     await user.save();
 
-    res.json(toPublicUser(user));
+    if (Array.isArray(accesses)) {
+      await setUserAccesses(user.id, user.role === "MANAGER" ? accesses : []);
+    }
+
+    const updatedUser = await findUserWithAccesses(user.id);
+    res.json(toPublicUser(updatedUser));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.delete("/users/:id", requireAuthorization, async (req, res) => {
+router.delete("/users/:id", requireAuthorization, requireFullAccess, async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -113,5 +161,109 @@ router.delete("/users/:id", requireAuthorization, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+router.get("/accesses", requireAuthorization, requireFullAccess, async (req, res) => {
+  try {
+    const accesses = await Access.findAll({
+      order: [
+        ["resource", "ASC"],
+        ["action", "ASC"],
+      ],
+    });
+
+    res.json(accesses);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get("/users/:id/accesses", requireAuthorization, requireFullAccess, async (req, res) => {
+  try {
+    const user = await findUserWithAccesses(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({
+        error: "User topilmadi",
+      });
+    }
+
+    res.json({
+      user: toPublicUser(user),
+      catalog: ACCESS_CATALOG,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.put("/users/:id/accesses", requireAuthorization, requireFullAccess, async (req, res) => {
+  const { accesses = [] } = req.body;
+
+  try {
+    const user = await AuthUser.findByPk(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({
+        error: "User topilmadi",
+      });
+    }
+
+    if (user.role !== "MANAGER") {
+      await UserAccess.destroy({ where: { userId: user.id } });
+      const updatedUser = await findUserWithAccesses(user.id);
+      return res.json(toPublicUser(updatedUser));
+    }
+
+    await setUserAccesses(user.id, accesses);
+    const updatedUser = await findUserWithAccesses(user.id);
+    res.json(toPublicUser(updatedUser));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+async function findUserWithAccesses(id) {
+  return AuthUser.findByPk(id, {
+    include: [
+      {
+        model: UserAccess,
+        as: "userAccesses",
+        include: [
+          {
+            model: Access,
+            as: "access",
+          },
+        ],
+      },
+    ],
+  });
+}
+
+async function setUserAccesses(userId, accessNames) {
+  const uniqueAccessNames = [...new Set(accessNames)].filter((name) =>
+    ACCESS_CATALOG.includes(name)
+  );
+
+  const accesses = await Access.findAll({
+    where: {
+      name: uniqueAccessNames,
+    },
+  });
+
+  await UserAccess.destroy({
+    where: {
+      userId,
+    },
+  });
+
+  await Promise.all(
+    accesses.map((access) =>
+      UserAccess.create({
+        userId,
+        accessId: access.id,
+      })
+    )
+  );
+}
 
 module.exports = router;

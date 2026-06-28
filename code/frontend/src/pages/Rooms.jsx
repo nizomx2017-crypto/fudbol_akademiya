@@ -4,6 +4,7 @@ import { roomsApi } from "../services/api.js";
 export default function Rooms() {
   return (
     <CrudPage
+      resource="rooms"
       title="Rooms"
       subtitle="Classrooms, capacities and equipment."
       api={roomsApi}

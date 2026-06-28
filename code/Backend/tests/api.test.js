@@ -5,14 +5,17 @@ require("dotenv").config();
 
 const LOGIN_ACCOUNTS = [
   { login: "admin", password: "test-login-password" },
-  { login: "teacher", password: "second-test-password" },
+  { login: "director", password: "second-test-password" },
 ];
+process.env.JWT_SECRET = "test-secret-for-jwt-rbac";
 process.env.LOGIN_PASSWORD = "";
 process.env.LOGIN_PASSWORDS = "";
 process.env.LOGIN_USER_1 = LOGIN_ACCOUNTS[0].login;
 process.env.LOGIN_PASSWORD_1 = LOGIN_ACCOUNTS[0].password;
+process.env.LOGIN_ROLE_1 = "ADMIN";
 process.env.LOGIN_USER_2 = LOGIN_ACCOUNTS[1].login;
 process.env.LOGIN_PASSWORD_2 = LOGIN_ACCOUNTS[1].password;
+process.env.LOGIN_ROLE_2 = "DIRECTOR";
 
 let db;
 let server;
@@ -46,17 +49,39 @@ async function ensureTestDatabase() {
   process.env.DB_NAME = testDbName;
 }
 
+async function login(account) {
+  const response = await fetch(`${baseUrl}/auth/login`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(account),
+  });
+  const body = await response.json();
+
+  assert.ok(response.ok, `login failed: ${JSON.stringify(body)}`);
+
+  return body;
+}
+
 async function request(path, options = {}) {
-  const needsAuthorization = path.startsWith("/api") || path.startsWith("/auth/users");
+  const needsAuthorization =
+    path.startsWith("/api") ||
+    path.startsWith("/auth/users") ||
+    path.startsWith("/auth/accesses") ||
+    path.startsWith("/auth/me");
+  const token = options.token || authToken;
   const headers = {
     "content-type": "application/json",
-    ...(needsAuthorization ? { Authorization: authToken } : {}),
+    ...(needsAuthorization ? { Authorization: `Bearer ${token}` } : {}),
     ...(options.headers || {}),
   };
+  const fetchOptions = { ...options };
+  delete fetchOptions.token;
 
   const response = await fetch(`${baseUrl}${path}`, {
     headers,
-    ...options,
+    ...fetchOptions,
   });
 
   const body = await response.json();
@@ -105,14 +130,7 @@ before(async () => {
   const { port } = server.address();
   baseUrl = `http://127.0.0.1:${port}`;
 
-  const loginResponse = await fetch(`${baseUrl}/auth/login`, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-    },
-    body: JSON.stringify(LOGIN_ACCOUNTS[0]),
-  });
-  const loginBody = await loginResponse.json();
+  const loginBody = await login(LOGIN_ACCOUNTS[0]);
   authToken = loginBody.token;
 });
 
@@ -156,40 +174,26 @@ describe("Backend API smoke tests", () => {
   });
 
   it("returns API token after successful login", async () => {
-    const response = await fetch(`${baseUrl}/auth/login`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(LOGIN_ACCOUNTS[0]),
-    });
-    const body = await response.json();
+    const body = await login(LOGIN_ACCOUNTS[0]);
 
-    assert.equal(response.status, 200);
     assert.equal(typeof body.token, "string");
-    assert.equal(body.token.length, 64);
+    assert.equal(body.token.split(".").length, 3);
     assert.notEqual(body.token, LOGIN_ACCOUNTS[0].password);
     assert.equal(body.user.login, LOGIN_ACCOUNTS[0].login);
+    assert.equal(body.user.role, "ADMIN");
   });
 
-  it("returns API token for another configured account", async () => {
-    const response = await fetch(`${baseUrl}/auth/login`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(LOGIN_ACCOUNTS[1]),
-    });
-    const body = await response.json();
+  it("returns API token for DIRECTOR account", async () => {
+    const body = await login(LOGIN_ACCOUNTS[1]);
 
-    assert.equal(response.status, 200);
     assert.equal(typeof body.token, "string");
-    assert.equal(body.token.length, 64);
+    assert.equal(body.token.split(".").length, 3);
     assert.notEqual(body.token, LOGIN_ACCOUNTS[1].password);
     assert.equal(body.user.login, LOGIN_ACCOUNTS[1].login);
+    assert.equal(body.user.role, "DIRECTOR");
   });
 
-  it("supports auth user management without exposing password hashes", async () => {
+  it("supports auth user management with roles and without exposing password hashes", async () => {
     const users = await request("/auth/users");
     assert.equal(users.length, 2);
     assert.equal(users[0].passwordHash, undefined);
@@ -197,8 +201,12 @@ describe("Backend API smoke tests", () => {
     const created = await createRecord("/auth/users", {
       login: "operator",
       password: "operator-password",
+      role: "MANAGER",
+      accesses: ["students:view"],
     });
     assert.equal(created.login, "operator");
+    assert.equal(created.role, "MANAGER");
+    assert.deepEqual(created.accesses, ["students:view"]);
     assert.equal(created.passwordHash, undefined);
 
     const loginResponse = await fetch(`${baseUrl}/auth/login`, {
@@ -214,11 +222,14 @@ describe("Backend API smoke tests", () => {
     const loginBody = await loginResponse.json();
     assert.equal(loginResponse.status, 200);
     assert.equal(loginBody.user.login, "operator");
+    assert.equal(loginBody.user.role, "MANAGER");
 
     const updated = await updateRecord(`/auth/users/${created.id}`, {
       password: "changed-password",
+      accesses: ["students:view", "students:create"],
     });
     assert.equal(updated.login, "operator");
+    assert.deepEqual(updated.accesses.sort(), ["students:create", "students:view"]);
 
     const oldPasswordResponse = await fetch(`${baseUrl}/auth/login`, {
       method: "POST",
@@ -234,6 +245,59 @@ describe("Backend API smoke tests", () => {
 
     const deleted = await deleteRecord(`/auth/users/${created.id}`);
     assert.equal(deleted.message, "Auth user deleted");
+  });
+
+  it("allows DIRECTOR full access without assigned permissions", async () => {
+    const directorLogin = await login(LOGIN_ACCOUNTS[1]);
+    const courses = await request("/api/courses", {
+      token: directorLogin.token,
+    });
+
+    assert.ok(Array.isArray(courses));
+  });
+
+  it("restricts MANAGER until DIRECTOR or ADMIN assigns accesses", async () => {
+    const manager = await createRecord("/auth/users", {
+      login: "manager",
+      password: "manager-password",
+      role: "MANAGER",
+    });
+
+    const managerLogin = await login({
+      login: "manager",
+      password: "manager-password",
+    });
+
+    const deniedResponse = await fetch(`${baseUrl}/api/students`, {
+      headers: {
+        Authorization: `Bearer ${managerLogin.token}`,
+      },
+    });
+    const deniedBody = await deniedResponse.json();
+
+    assert.equal(deniedResponse.status, 403);
+    assert.equal(deniedBody.requiredAccess, "students:view");
+
+    const updated = await request(`/auth/users/${manager.id}/accesses`, {
+      method: "PUT",
+      body: JSON.stringify({
+        accesses: ["students:view", "students:create"],
+      }),
+    });
+
+    assert.deepEqual(updated.accesses.sort(), ["students:create", "students:view"]);
+
+    const allowedStudents = await request("/api/students", {
+      token: managerLogin.token,
+    });
+    assert.equal(allowedStudents.total, 0);
+
+    const stillDeniedResponse = await fetch(`${baseUrl}/api/teachers`, {
+      headers: {
+        Authorization: `Bearer ${managerLogin.token}`,
+      },
+    });
+    assert.equal(stillDeniedResponse.status, 403);
   });
 
   it("supports Course CRUD", async () => {

@@ -9,20 +9,38 @@ import Payments from "./pages/Payments.jsx";
 import Rooms from "./pages/Rooms.jsx";
 import Settings from "./pages/Settings.jsx";
 import AuthGate from "./components/AuthGate.jsx";
+import { useAuth } from "./auth/AuthContext.jsx";
+
+function ProtectedPage({ access, children }) {
+  const { hasAccess } = useAuth();
+
+  if (!hasAccess(access)) {
+    return (
+      <div className="page">
+        <div className="card settings-section">
+          <div className="card-title">Access denied</div>
+          <p className="page-sub">Bu sahifani ko'rish uchun access berilmagan.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return children;
+}
 
 export default function App() {
   return (
     <AuthGate>
       <Routes>
         <Route element={<Layout />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/students" element={<Students />} />
-          <Route path="/teachers" element={<Teachers />} />
-          <Route path="/courses" element={<Courses />} />
-          <Route path="/groups" element={<Groups />} />
-          <Route path="/payments" element={<Payments />} />
-          <Route path="/rooms" element={<Rooms />} />
-          <Route path="/settings" element={<Settings />} />
+          <Route path="/" element={<ProtectedPage access="dashboard:view"><Dashboard /></ProtectedPage>} />
+          <Route path="/students" element={<ProtectedPage access="students:view"><Students /></ProtectedPage>} />
+          <Route path="/teachers" element={<ProtectedPage access="teachers:view"><Teachers /></ProtectedPage>} />
+          <Route path="/courses" element={<ProtectedPage access="courses:view"><Courses /></ProtectedPage>} />
+          <Route path="/groups" element={<ProtectedPage access="groups:view"><Groups /></ProtectedPage>} />
+          <Route path="/payments" element={<ProtectedPage access="payments:view"><Payments /></ProtectedPage>} />
+          <Route path="/rooms" element={<ProtectedPage access="rooms:view"><Rooms /></ProtectedPage>} />
+          <Route path="/settings" element={<ProtectedPage access="settings:view"><Settings /></ProtectedPage>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

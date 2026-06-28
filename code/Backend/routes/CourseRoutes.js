@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { requireAccess } = require("../middleware/access");
 
 const {
     getCourses,
@@ -8,12 +9,12 @@ const {
     deleteCourse
 } = require("../controller/CourseController");
 
-router.get("/", getCourses);
+router.get("/", requireAccess("courses:view"), getCourses);
 
-router.post("/", createCourse);
+router.post("/", requireAccess("courses:create"), createCourse);
 
-router.put("/:id", updateCourse);
+router.put("/:id", requireAccess("courses:update"), updateCourse);
 
-router.delete("/:id", deleteCourse);
+router.delete("/:id", requireAccess("courses:delete"), deleteCourse);
 
 module.exports = router;

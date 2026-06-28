@@ -4,6 +4,7 @@ import { coursesApi } from "../services/api.js";
 export default function Courses() {
   return (
     <CrudPage
+      resource="courses"
       title="Courses"
       subtitle="Manage available courses and pricing."
       api={coursesApi}

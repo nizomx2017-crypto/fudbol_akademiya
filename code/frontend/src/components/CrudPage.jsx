@@ -3,8 +3,10 @@ import { Search, Plus, Pencil, Trash2, Inbox } from "lucide-react";
 import Pagination from "./Pagination.jsx";
 import Modal from "./Modal.jsx";
 import ConfirmDialog from "./ConfirmDialog.jsx";
+import { useAuth } from "../auth/AuthContext.jsx";
 
 export default function CrudPage({
+  resource,
   title,
   subtitle,
   initialData = [],
@@ -14,6 +16,7 @@ export default function CrudPage({
   searchKeys = ["name"],
   addLabel = "Add new",
 }) {
+  const { can } = useAuth();
   const [rows, setRows] = useState(initialData);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
@@ -57,6 +60,9 @@ export default function CrudPage({
   }, [rows, query, searchKeys]);
 
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
+  const canCreate = can(resource, "create");
+  const canUpdate = can(resource, "update");
+  const canDelete = can(resource, "delete");
 
   function showMessage(text) {
     setMessage(text);
@@ -131,9 +137,11 @@ export default function CrudPage({
           {subtitle && <p className="page-sub">{subtitle}</p>}
         </div>
 
-        <button className="btn btn-primary" onClick={openAdd}>
-          <Plus /> {addLabel}
-        </button>
+        {canCreate ? (
+          <button className="btn btn-primary" onClick={openAdd}>
+            <Plus /> {addLabel}
+          </button>
+        ) : null}
       </div>
 
       <div className="card">
@@ -166,7 +174,7 @@ export default function CrudPage({
                   {columns.map((c) => (
                     <th key={c.key}>{c.label}</th>
                   ))}
-                  <th style={{ textAlign: "right" }}>Actions</th>
+                  {(canUpdate || canDelete) ? <th style={{ textAlign: "right" }}>Actions</th> : null}
                 </tr>
               </thead>
 
@@ -179,25 +187,31 @@ export default function CrudPage({
                       </td>
                     ))}
 
-                    <td>
-                      <div className="cell-actions">
-                        <button
-                          className="btn-icon"
-                          onClick={() => openEdit(row)}
-                          aria-label="Edit"
-                        >
-                          <Pencil />
-                        </button>
+                    {(canUpdate || canDelete) ? (
+                      <td>
+                        <div className="cell-actions">
+                          {canUpdate ? (
+                            <button
+                              className="btn-icon"
+                              onClick={() => openEdit(row)}
+                              aria-label="Edit"
+                            >
+                              <Pencil />
+                            </button>
+                          ) : null}
 
-                        <button
-                          className="btn-icon danger"
-                          onClick={() => setToDelete(row)}
-                          aria-label="Delete"
-                        >
-                          <Trash2 />
-                        </button>
-                      </div>
-                    </td>
+                          {canDelete ? (
+                            <button
+                              className="btn-icon danger"
+                              onClick={() => setToDelete(row)}
+                              aria-label="Delete"
+                            >
+                              <Trash2 />
+                            </button>
+                          ) : null}
+                        </div>
+                      </td>
+                    ) : null}
                   </tr>
                 ))}
               </tbody>

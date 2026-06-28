@@ -3,8 +3,10 @@ import { KeyRound, Pencil, Plus, Save, Trash2, Users } from "lucide-react";
 import Modal from "../components/Modal.jsx";
 import ConfirmDialog from "../components/ConfirmDialog.jsx";
 import { authUsersApi } from "../services/api.js";
+import { useAuth } from "../auth/AuthContext.jsx";
 
 export default function Settings() {
+  const { hasFullAccess } = useAuth();
   const [prefs, setPrefs] = useState({
     notifications: true,
     sms: false,
@@ -19,18 +21,30 @@ export default function Settings() {
     phone: "+998 90 123-45-67",
   });
   const [authUsers, setAuthUsers] = useState([]);
+  const [accessCatalog, setAccessCatalog] = useState([]);
   const [authLoading, setAuthLoading] = useState(true);
   const [authError, setAuthError] = useState("");
   const [editingUser, setEditingUser] = useState(null);
-  const [userForm, setUserForm] = useState({ login: "", password: "", status: "active" });
+  const [userForm, setUserForm] = useState({
+    login: "",
+    password: "",
+    role: "MANAGER",
+    status: "active",
+    accesses: [],
+  });
   const [userToDelete, setUserToDelete] = useState(null);
   const [message, setMessage] = useState("");
 
   const toggle = (k) => setPrefs({ ...prefs, [k]: !prefs[k] });
 
   useEffect(() => {
-    loadAuthUsers();
-  }, []);
+    if (hasFullAccess) {
+      loadAuthUsers();
+      loadAccessCatalog();
+    } else {
+      setAuthLoading(false);
+    }
+  }, [hasFullAccess]);
 
   async function loadAuthUsers() {
     try {
@@ -45,18 +59,39 @@ export default function Settings() {
     }
   }
 
+  async function loadAccessCatalog() {
+    try {
+      const accesses = await authUsersApi.accesses();
+      setAccessCatalog(accesses);
+    } catch (error) {
+      setAuthError(error.message);
+    }
+  }
+
   function showMessage(text) {
     setMessage(text);
     setTimeout(() => setMessage(""), 5000);
   }
 
   function openAddUser() {
-    setUserForm({ login: "", password: "", status: "active" });
+    setUserForm({
+      login: "",
+      password: "",
+      role: "MANAGER",
+      status: "active",
+      accesses: [],
+    });
     setEditingUser("new");
   }
 
   function openEditUser(user) {
-    setUserForm({ login: user.login, password: "", status: user.status });
+    setUserForm({
+      login: user.login,
+      password: "",
+      role: user.role,
+      status: user.status,
+      accesses: user.accesses || [],
+    });
     setEditingUser(user);
   }
 
@@ -64,7 +99,9 @@ export default function Settings() {
     try {
       const payload = {
         login: userForm.login,
+        role: userForm.role,
         status: userForm.status,
+        accesses: userForm.role === "MANAGER" ? userForm.accesses : [],
       };
 
       if (userForm.password) {
@@ -85,6 +122,16 @@ export default function Settings() {
     } catch (error) {
       setAuthError(error.message);
     }
+  }
+
+  function toggleAccess(accessName) {
+    const exists = userForm.accesses.includes(accessName);
+    setUserForm({
+      ...userForm,
+      accesses: exists
+        ? userForm.accesses.filter((name) => name !== accessName)
+        : [...userForm.accesses, accessName],
+    });
   }
 
   async function confirmDeleteUser() {
@@ -110,69 +157,75 @@ export default function Settings() {
         <button className="btn btn-primary"><Save /> Save changes</button>
       </div>
 
-      <div className="card settings-section" style={{ marginBottom: 18 }}>
-        <div className="card-header" style={{ padding: 0, borderBottom: 0, marginBottom: 16 }}>
-          <div>
-            <div className="card-title" style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <Users size={18} /> Login boshqaruvi
+      {hasFullAccess ? (
+        <div className="card settings-section" style={{ marginBottom: 18 }}>
+          <div className="card-header" style={{ padding: 0, borderBottom: 0, marginBottom: 16 }}>
+            <div>
+              <div className="card-title" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <Users size={18} /> Login va access boshqaruvi
+              </div>
+              <p className="page-sub">DIRECTOR managerga page va action accesslarini shu yerdan beradi.</p>
             </div>
-            <p className="page-sub">Tizimga kiradigan login va parollar bazadan boshqariladi.</p>
+
+            <button className="btn btn-primary" onClick={openAddUser}>
+              <Plus /> Login qo'shish
+            </button>
           </div>
 
-          <button className="btn btn-primary" onClick={openAddUser}>
-            <Plus /> Login qo'shish
-          </button>
-        </div>
+          {authError ? <p className="auth-error" style={{ marginBottom: 12 }}>{authError}</p> : null}
 
-        {authError ? <p className="auth-error" style={{ marginBottom: 12 }}>{authError}</p> : null}
-
-        {authLoading ? (
-          <div className="loading-box" style={{ height: 180 }}>
-            <div className="loader"></div>
-          </div>
-        ) : (
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Login</th>
-                  <th>Status</th>
-                  <th>Yaratilgan vaqt</th>
-                  <th style={{ textAlign: "right" }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {authUsers.map((user) => (
-                  <tr key={user.id}>
-                    <td>
-                      <div className="avatar-cell">
-                        <span className="avatar-sm"><KeyRound size={14} /></span>
-                        <span className="cell-strong">{user.login}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <span className={`badge ${user.status === "active" ? "success" : "neutral"}`}>
-                        {user.status}
-                      </span>
-                    </td>
-                    <td className="cell-dim">{new Date(user.createdAt).toLocaleString()}</td>
-                    <td>
-                      <div className="cell-actions">
-                        <button className="btn-icon" onClick={() => openEditUser(user)} aria-label="Edit login">
-                          <Pencil />
-                        </button>
-                        <button className="btn-icon danger" onClick={() => setUserToDelete(user)} aria-label="Delete login">
-                          <Trash2 />
-                        </button>
-                      </div>
-                    </td>
+          {authLoading ? (
+            <div className="loading-box" style={{ height: 180 }}>
+              <div className="loader"></div>
+            </div>
+          ) : (
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Login</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Accesslar</th>
+                    <th style={{ textAlign: "right" }}>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+                </thead>
+                <tbody>
+                  {authUsers.map((user) => (
+                    <tr key={user.id}>
+                      <td>
+                        <div className="avatar-cell">
+                          <span className="avatar-sm"><KeyRound size={14} /></span>
+                          <span className="cell-strong">{user.login}</span>
+                        </div>
+                      </td>
+                      <td><span className="badge info">{user.role}</span></td>
+                      <td>
+                        <span className={`badge ${user.status === "active" ? "success" : "neutral"}`}>
+                          {user.status}
+                        </span>
+                      </td>
+                      <td className="cell-dim">
+                        {user.role === "MANAGER" ? `${user.accesses?.length || 0} ta` : "Full access"}
+                      </td>
+                      <td>
+                        <div className="cell-actions">
+                          <button className="btn-icon" onClick={() => openEditUser(user)} aria-label="Edit login">
+                            <Pencil />
+                          </button>
+                          <button className="btn-icon danger" onClick={() => setUserToDelete(user)} aria-label="Delete login">
+                            <Trash2 />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      ) : null}
 
       <div className="settings-grid">
         <div className="card settings-section">
@@ -229,6 +282,24 @@ export default function Settings() {
           </div>
 
           <div className="field">
+            <label>Role</label>
+            <select
+              value={userForm.role}
+              onChange={(event) =>
+                setUserForm({
+                  ...userForm,
+                  role: event.target.value,
+                  accesses: event.target.value === "MANAGER" ? userForm.accesses : [],
+                })
+              }
+            >
+              <option value="ADMIN">ADMIN</option>
+              <option value="DIRECTOR">DIRECTOR</option>
+              <option value="MANAGER">MANAGER</option>
+            </select>
+          </div>
+
+          <div className="field">
             <label>Status</label>
             <select
               value={userForm.status}
@@ -248,6 +319,24 @@ export default function Settings() {
               onChange={(event) => setUserForm({ ...userForm, password: event.target.value })}
             />
           </div>
+
+          {userForm.role === "MANAGER" ? (
+            <div className="field" style={{ gridColumn: "1 / -1" }}>
+              <label>Manager accesslari</label>
+              <div className="access-grid">
+                {accessCatalog.map((access) => (
+                  <label className="access-check" key={access.name}>
+                    <input
+                      type="checkbox"
+                      checked={userForm.accesses.includes(access.name)}
+                      onChange={() => toggleAccess(access.name)}
+                    />
+                    <span>{access.name}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
       </Modal>
 

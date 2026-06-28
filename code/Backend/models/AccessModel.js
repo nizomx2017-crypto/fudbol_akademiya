@@ -1,35 +1,28 @@
 const { DataTypes } = require("sequelize");
 const db = require("../config/db");
 
-const AuthUser = db.define("auth_users", {
+const Access = db.define("accesses", {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true,
   },
 
-  login: {
+  name: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
   },
 
-  passwordHash: {
+  resource: {
     type: DataTypes.STRING,
     allowNull: false,
   },
 
-  role: {
-    type: DataTypes.ENUM("ADMIN", "DIRECTOR", "MANAGER"),
-    allowNull: false,
-    defaultValue: "MANAGER",
-  },
-
-  status: {
+  action: {
     type: DataTypes.STRING,
     allowNull: false,
-    defaultValue: "active",
   },
 });
 
-module.exports = AuthUser;
+module.exports = Access;

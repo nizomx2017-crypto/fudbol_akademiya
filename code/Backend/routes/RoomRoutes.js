@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { requireAccess } = require("../middleware/access");
 
 const {
     getRooms,
@@ -8,12 +9,12 @@ const {
     deleteRoom
 } = require("../controller/RoomController");
 
-router.get("/", getRooms);
+router.get("/", requireAccess("rooms:view"), getRooms);
 
-router.post("/", createRoom);
+router.post("/", requireAccess("rooms:create"), createRoom);
 
-router.put("/:id", updateRoom);
+router.put("/:id", requireAccess("rooms:update"), updateRoom);
 
-router.delete("/:id", deleteRoom);
+router.delete("/:id", requireAccess("rooms:delete"), deleteRoom);
 
 module.exports = router;

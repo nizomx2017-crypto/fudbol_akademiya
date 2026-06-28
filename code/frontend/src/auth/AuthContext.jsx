@@ -1,0 +1,64 @@
+import { createContext, useContext, useMemo, useState } from "react";
+import {
+  AUTH_TOKEN_STORAGE_KEY,
+  AUTH_USER_STORAGE_KEY,
+  login as apiLogin,
+} from "../services/api.js";
+
+const AuthContext = createContext(null);
+
+function readStoredUser() {
+  try {
+    const value = sessionStorage.getItem(AUTH_USER_STORAGE_KEY);
+    return value ? JSON.parse(value) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(readStoredUser);
+
+  async function signIn(credentials) {
+    const body = await apiLogin(credentials);
+    setUser(body.user);
+    return body;
+  }
+
+  function signOut() {
+    sessionStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+    sessionStorage.removeItem(AUTH_USER_STORAGE_KEY);
+    setUser(null);
+  }
+
+  const value = useMemo(() => {
+    const hasFullAccess = user?.role === "ADMIN" || user?.role === "DIRECTOR";
+
+    return {
+      user,
+      isAuthenticated: Boolean(user && sessionStorage.getItem(AUTH_TOKEN_STORAGE_KEY)),
+      hasFullAccess,
+      hasAccess(access) {
+        return hasFullAccess || Boolean(user?.accesses?.includes(access));
+      },
+      can(resource, action) {
+        return hasFullAccess || Boolean(user?.accesses?.includes(`${resource}:${action}`));
+      },
+      signIn,
+      signOut,
+      setUser,
+    };
+  }, [user]);
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error("useAuth must be used inside AuthProvider");
+  }
+
+  return context;
+}

@@ -4,6 +4,7 @@ import { paymentsApi } from "../services/api.js";
 export default function Payments() {
   return (
     <CrudPage
+      resource="payments"
       title="Payments"
       subtitle="Tuition payments and transaction history."
       api={paymentsApi}

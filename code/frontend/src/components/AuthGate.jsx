@@ -1,10 +1,8 @@
 import { useState } from "react";
-import { AUTH_TOKEN_STORAGE_KEY, login } from "../services/api.js";
+import { useAuth } from "../auth/AuthContext.jsx";
 
 export default function AuthGate({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    () => Boolean(sessionStorage.getItem(AUTH_TOKEN_STORAGE_KEY))
-  );
+  const { isAuthenticated, signIn } = useAuth();
   const [loginValue, setLoginValue] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -16,8 +14,7 @@ export default function AuthGate({ children }) {
     setError("");
 
     try {
-      await login({ login: loginValue, password });
-      setIsAuthenticated(true);
+      await signIn({ login: loginValue, password });
     } catch (error) {
       setError(error.message);
       setPassword("");

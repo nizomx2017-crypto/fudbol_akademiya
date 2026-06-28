@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { requireAccess } = require("../middleware/access");
 
 const {
     getGroups,
@@ -8,12 +9,12 @@ const {
     deleteGroup
 } = require("../controller/GroupController");
 
-router.get("/", getGroups);
+router.get("/", requireAccess("groups:view"), getGroups);
 
-router.post("/", createGroup);
+router.post("/", requireAccess("groups:create"), createGroup);
 
-router.put("/:id", updateGroup);
+router.put("/:id", requireAccess("groups:update"), updateGroup);
 
-router.delete("/:id", deleteGroup);
+router.delete("/:id", requireAccess("groups:delete"), deleteGroup);
 
 module.exports = router;
