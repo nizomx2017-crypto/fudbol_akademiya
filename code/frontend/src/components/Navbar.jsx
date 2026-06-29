@@ -1,13 +1,13 @@
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Bell, LogOut, Menu, Search, ShieldCheck, Sun, UserRound } from "lucide-react";
-import { useAuth } from "../auth/AuthContext.jsx";
+import { useAuth } from "../auth/useAuth.js";
 import { AUTH_TOKEN_STORAGE_KEY } from "../services/api.js";
 
 export default function Navbar({ onMenu }) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
   const { hasFullAccess, signOut, user } = useAuth();
-  const tokenInfo = useMemo(getTokenInfo, [user]);
+  const tokenInfo = getTokenInfo();
   const accessCount = hasFullAccess ? "Full" : user?.accesses?.length || 0;
 
   return (

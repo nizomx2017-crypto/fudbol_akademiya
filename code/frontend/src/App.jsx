@@ -9,7 +9,7 @@ import Payments from "./pages/Payments.jsx";
 import Rooms from "./pages/Rooms.jsx";
 import Settings from "./pages/Settings.jsx";
 import AuthGate from "./components/AuthGate.jsx";
-import { useAuth } from "./auth/AuthContext.jsx";
+import { useAuth } from "./auth/useAuth.js";
 
 function ProtectedPage({ access, children }) {
   const { hasAccess } = useAuth();

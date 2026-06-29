@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { AuthContext } from "./AuthContext.js";
 import {
   AUTH_TOKEN_STORAGE_KEY,
   AUTH_LAST_LOGIN_STORAGE_KEY,
@@ -6,8 +7,6 @@ import {
   getCurrentUser,
   login as apiLogin,
 } from "../services/api.js";
-
-const AuthContext = createContext(null);
 
 function readStoredUser() {
   try {
@@ -68,14 +67,4 @@ export function AuthProvider({ children }) {
   }, [user]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth must be used inside AuthProvider");
-  }
-
-  return context;
 }

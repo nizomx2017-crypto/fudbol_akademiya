@@ -1,5 +1,11 @@
 {
-  "dependencies": {
-    "dotenv": "^17.4.2"
+  "name": "oquv-markazi",
+  "private": true,
+  "scripts": {
+    "backend:start": "npm --prefix code/Backend start",
+    "backend:test": "npm --prefix code/Backend test",
+    "frontend:dev": "npm --prefix code/frontend run dev",
+    "frontend:build": "npm --prefix code/frontend run build",
+    "frontend:lint": "npm --prefix code/frontend run lint"
   }
 }

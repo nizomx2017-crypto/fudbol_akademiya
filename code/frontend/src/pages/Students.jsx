@@ -23,7 +23,7 @@ export default function Students() {
           )
         },
         { key: "group", label: "Group", render: (r) => <span className="badge info">{r.group}</span> },
-        { key: "balance", label: "Balance", render: (r) => `${r.balance.toLocaleString()} UZS` },
+        { key: "balance", label: "Balance", render: (r) => `${Number(r.balance || 0).toLocaleString()} UZS` },
         { key: "status", label: "Status", render: (r) => <span className={`badge ${r.status === "Active" ? "success" : "warn"}`}>{r.status}</span> },
         { key: "joined", label: "Joined", render: (r) => <span className="cell-dim">{r.joined}</span> },
       ]}

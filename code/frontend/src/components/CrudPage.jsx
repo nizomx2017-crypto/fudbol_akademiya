@@ -3,7 +3,7 @@ import { Search, Plus, Pencil, Trash2, Inbox } from "lucide-react";
 import Pagination from "./Pagination.jsx";
 import Modal from "./Modal.jsx";
 import ConfirmDialog from "./ConfirmDialog.jsx";
-import { useAuth } from "../auth/AuthContext.jsx";
+import { useAuth } from "../auth/useAuth.js";
 
 export default function CrudPage({
   resource,
@@ -18,7 +18,7 @@ export default function CrudPage({
 }) {
   const { can } = useAuth();
   const [rows, setRows] = useState(initialData);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(api));
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const pageSize = 8;
@@ -30,7 +30,6 @@ export default function CrudPage({
 
   useEffect(() => {
     if (!api) {
-      setLoading(false);
       return;
     }
 

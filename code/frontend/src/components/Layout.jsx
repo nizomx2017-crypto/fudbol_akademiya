@@ -10,7 +10,6 @@ export default function Layout() {
       <Sidebar open={open} onClose={() => setOpen(false)} />
       <div className="main">
         <Navbar onMenu={() => setOpen((v) => !v)} />
-            <h1 style={{ color: "white" }}>TEST CHIQDI</h1>
         <Outlet />
       </div>
     </div>

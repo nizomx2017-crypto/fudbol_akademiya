@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Users, GraduationCap, BookOpen,
   Layers, CreditCard, DoorOpen, Settings, Sparkles
 } from "lucide-react";
-import { useAuth } from "../auth/AuthContext.jsx";
+import { useAuth } from "../auth/useAuth.js";
 
 const items = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, access: "dashboard:view" },

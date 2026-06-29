@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { KeyRound, Pencil, Plus, Trash2, Users } from "lucide-react";
 import Modal from "../components/Modal.jsx";
 import ConfirmDialog from "../components/ConfirmDialog.jsx";
 import { authUsersApi } from "../services/api.js";
-import { useAuth } from "../auth/AuthContext.jsx";
+import { useAuth } from "../auth/useAuth.js";
 
 const ACCESS_ROLES = ["MANAGER", "TEACHER", "STUDENT"];
 const ROLE_ACCESS_LABELS = {
@@ -55,16 +55,7 @@ export default function Settings() {
 
   const toggle = (k) => setPrefs({ ...prefs, [k]: !prefs[k] });
 
-  useEffect(() => {
-    if (hasFullAccess) {
-      loadAuthUsers();
-      loadAccessCatalog();
-    } else {
-      setAuthLoading(false);
-    }
-  }, [hasFullAccess]);
-
-  async function loadAuthUsers() {
+  const loadAuthUsers = useCallback(async function loadAuthUsers() {
     try {
       setAuthLoading(true);
       setAuthError("");
@@ -75,16 +66,27 @@ export default function Settings() {
     } finally {
       setAuthLoading(false);
     }
-  }
+  }, []);
 
-  async function loadAccessCatalog() {
+  const loadAccessCatalog = useCallback(async function loadAccessCatalog() {
     try {
       const accesses = await authUsersApi.accesses();
       setAccessCatalog(accesses);
     } catch (error) {
       setAuthError(error.message);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    if (!hasFullAccess) {
+      return;
+    }
+
+    queueMicrotask(() => {
+      loadAuthUsers();
+      loadAccessCatalog();
+    });
+  }, [hasFullAccess, loadAuthUsers, loadAccessCatalog]);
 
   function showMessage(text) {
     setMessage(text);

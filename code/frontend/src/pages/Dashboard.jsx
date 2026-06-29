@@ -16,7 +16,7 @@ import {
   mockStudents,
   mockTeachers,
 } from "../services/mockData.js";
-import { useAuth } from "../auth/AuthContext.jsx";
+import { useAuth } from "../auth/useAuth.js";
 
 const stats = [
   { label: "Total Students", value: mockStudents.length, trend: "+12%", icon: Users, access: "students:view" },
@@ -156,7 +156,9 @@ function StudentOverview({ recent, role, showBalanceColumn }) {
                   </div>
                 </td>
                 <td><span className="badge info">{student.group}</span></td>
-                {showBalanceColumn ? <td className="cell-strong">{student.balance.toLocaleString()} UZS</td> : null}
+                {showBalanceColumn ? (
+                  <td className="cell-strong">{Number(student.balance || 0).toLocaleString()} UZS</td>
+                ) : null}
                 <td>
                   <span className={`badge ${student.status === "Active" ? "success" : "warn"}`}>
                     {student.status}
