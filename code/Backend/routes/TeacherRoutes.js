@@ -7,7 +7,7 @@ const {
     createTeacher,
     updateTeacher,
     deleteTeacher
-} = require("../controller/TeacherController");
+} = require("../controller/teachercontroller");
 
 router.get("/", requireAccess("teachers:view"), getTeachers);
 

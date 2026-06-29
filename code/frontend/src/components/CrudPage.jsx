@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Search, Plus, Pencil, Trash2, Inbox } from "lucide-react";
-import Pagination from "./Pagination.jsx";
-import Modal from "./Modal.jsx";
-import ConfirmDialog from "./ConfirmDialog.jsx";
-import { useAuth } from "../auth/useAuth.js";
+import Pagination from "./pagination.jsx";
+import Modal from "./modal.jsx";
+import ConfirmDialog from "./confirmdialog.jsx";
+import { useAuth } from "../auth/useauth.js";
 
 export default function CrudPage({
   resource,

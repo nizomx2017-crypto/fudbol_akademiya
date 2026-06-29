@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { KeyRound, Pencil, Plus, Trash2, Users } from "lucide-react";
-import Modal from "../components/Modal.jsx";
-import ConfirmDialog from "../components/ConfirmDialog.jsx";
+import Modal from "../components/modal.jsx";
+import ConfirmDialog from "../components/confirmdialog.jsx";
 import { authUsersApi } from "../services/api.js";
-import { useAuth } from "../auth/useAuth.js";
+import { useAuth } from "../auth/useauth.js";
 
 const ACCESS_ROLES = ["MANAGER", "TEACHER", "STUDENT"];
 const ROLE_ACCESS_LABELS = {

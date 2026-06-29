@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../auth/useAuth.js";
+import { useAuth } from "../auth/useauth.js";
 
 export default function AuthGate({ children }) {
   const { isAuthenticated, signIn } = useAuth();

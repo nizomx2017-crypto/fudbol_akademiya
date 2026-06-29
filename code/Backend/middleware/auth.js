@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
-const AuthUser = require("../models/AuthUserModel");
-const Access = require("../models/AccessModel");
-const UserAccess = require("../models/UserAccessModel");
+const AuthUser = require("../models/authusermodel");
+const Access = require("../models/accessmodel");
+const UserAccess = require("../models/useraccessmodel");
 
 const DEFAULT_JWT_EXPIRES_IN = "8h";
 

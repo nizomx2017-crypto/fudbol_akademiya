@@ -1,12 +1,12 @@
 const express = require("express");
 const requireAuthorization = require("../middleware/auth");
 const { requireFullAccess } = require("../middleware/access");
-const AuthUser = require("../models/AuthUserModel");
-const Access = require("../models/AccessModel");
-const UserAccess = require("../models/UserAccessModel");
+const AuthUser = require("../models/authusermodel");
+const Access = require("../models/accessmodel");
+const UserAccess = require("../models/useraccessmodel");
 const { hashPassword, verifyPassword } = require("../utils/password");
-const { ACCESS_CATALOG } = require("../constants/accessCatalog");
-const { DEFAULT_ROLE_ACCESSES } = require("../constants/roleAccessDefaults");
+const { ACCESS_CATALOG } = require("../constants/accesscatalog");
+const { DEFAULT_ROLE_ACCESSES } = require("../constants/roleaccessdefaults");
 const ROLE_TYPES = ["ADMIN", "DIRECTOR", "MANAGER", "TEACHER", "STUDENT"];
 
 const router = express.Router();

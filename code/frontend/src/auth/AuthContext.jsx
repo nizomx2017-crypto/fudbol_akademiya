@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { AuthContext } from "./AuthContext.js";
+import { AuthContext } from "./authcontext.js";
 import {
   AUTH_TOKEN_STORAGE_KEY,
   AUTH_LAST_LOGIN_STORAGE_KEY,

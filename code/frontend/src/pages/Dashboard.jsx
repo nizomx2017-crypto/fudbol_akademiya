@@ -15,8 +15,8 @@ import {
   mockRooms,
   mockStudents,
   mockTeachers,
-} from "../services/mockData.js";
-import { useAuth } from "../auth/useAuth.js";
+} from "../services/mockdata.js";
+import { useAuth } from "../auth/useauth.js";
 
 const stats = [
   { label: "Total Students", value: mockStudents.length, trend: "+12%", icon: Users, access: "students:view" },

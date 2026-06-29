@@ -7,7 +7,7 @@ const {
     createCourse,
     updateCourse,
     deleteCourse
-} = require("../controller/CourseController");
+} = require("../controller/coursecontroller");
 
 router.get("/", requireAccess("courses:view"), getCourses);
 

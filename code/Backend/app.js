@@ -2,13 +2,13 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
-const studentRoutes = require("./routes/StudentRoutes");
-const courseRoutes = require("./routes/CourseRoutes");
-const teacherRoutes = require("./routes/TeacherRoutes");
-const groupRoutes = require("./routes/GroupRoutes");
-const paymentRoutes = require("./routes/PaymentRoutes");
-const roomRoutes = require("./routes/RoomRoutes");
-const authRoutes = require("./routes/AuthRoutes");
+const studentRoutes = require("./routes/studentroutes");
+const courseRoutes = require("./routes/courseroutes");
+const teacherRoutes = require("./routes/teacherroutes");
+const groupRoutes = require("./routes/grouproutes");
+const paymentRoutes = require("./routes/paymentroutes");
+const roomRoutes = require("./routes/roomroutes");
+const authRoutes = require("./routes/authroutes");
 const requireAuthorization = require("./middleware/auth");
 require("./models/associations");
 

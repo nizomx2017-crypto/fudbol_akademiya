@@ -1,9 +1,9 @@
-const Student = require("./StudentModel");
-const Course = require("./CourseModel");
-const AuthUser = require("./AuthUserModel");
-const Role = require("./RoleModel");
-const Access = require("./AccessModel");
-const UserAccess = require("./UserAccessModel");
+const Student = require("./studentmodel");
+const Course = require("./coursemodel");
+const AuthUser = require("./authusermodel");
+const Role = require("./rolemodel");
+const Access = require("./accessmodel");
+const UserAccess = require("./useraccessmodel");
 
 
 Course.hasMany(Student);

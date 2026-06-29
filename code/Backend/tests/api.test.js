@@ -118,7 +118,7 @@ before(async () => {
   await ensureTestDatabase();
 
   const app = require("../app");
-  const seedAuthUsers = require("../models/seedAuthUsers");
+  const seedAuthUsers = require("../models/seedauthusers");
   db = require("../config/db");
 
   await db.sync({ force: true });

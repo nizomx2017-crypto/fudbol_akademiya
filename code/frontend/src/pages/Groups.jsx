@@ -1,30 +1,39 @@
-import CrudPage from "../components/CrudPage.jsx";
-import { groupsApi } from "../services/api.js";
+import CrudPage from "../components/crudpage.jsx";
+import { teachersApi } from "../services/api.js";
 
-export default function Groups() {
+export default function Teachers() {
   return (
     <CrudPage
-      resource="groups"
-      title="Groups"
-      subtitle="Active study groups and schedules."
-      api={groupsApi}
-      searchKeys={["name", "course", "teacher"]}
-      addLabel="Add group"
+      resource="teachers"
+      title="Teachers"
+      subtitle="Your team of instructors and mentors."
+      api={teachersApi}
+      searchKeys={["fullname", "subject", "phone"]}
+      addLabel="Add teacher"
       columns={[
-        { key: "name", label: "Group", render: (r) => <span className="badge info">{r.name}</span> },
-        { key: "course", label: "Course", render: (r) => <span className="cell-strong">{r.course}</span> },
-        { key: "teacher", label: "Teacher", render: (r) => <span className="cell-dim">{r.teacher}</span> },
-        { key: "students", label: "Students" },
-        { key: "schedule", label: "Schedule", render: (r) => <span className="cell-dim">{r.schedule}</span> },
-        { key: "room", label: "Room" },
+        {
+          key: "fullname",
+          label: "Teacher",
+          render: (r) => (
+            <div className="avatar-cell">
+              <div className="avatar-sm">
+                {r.fullname?.split(" ").map(n => n[0]).slice(0, 2).join("")}
+              </div>
+              <div>
+                <div className="cell-strong">{r.fullname}</div>
+                <div className="cell-dim" style={{ fontSize: 12 }}>{r.phone}</div>
+              </div>
+            </div>
+          )
+        },
+        { key: "subject", label: "Subject", render: (r) => <span className="badge info">{r.subject}</span> },
+        { key: "salary", label: "Salary" },
       ]}
       fields={[
-        { key: "name", label: "Group name" },
-        { key: "course", label: "Course" },
-        { key: "teacher", label: "Teacher" },
-        { key: "students", label: "Students", type: "number" },
-        { key: "schedule", label: "Schedule" },
-        { key: "room", label: "Room" },
+        { key: "fullname", label: "Full name" },
+        { key: "subject", label: "Subject" },
+        { key: "phone", label: "Phone" },
+        { key: "salary", label: "Salary", type: "number" },
       ]}
     />
   );

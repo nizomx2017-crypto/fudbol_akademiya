@@ -1,15 +1,15 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import Layout from "./components/Layout.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
-import Students from "./pages/Students.jsx";
-import Teachers from "./pages/Teachers.jsx";
-import Courses from "./pages/Courses.jsx";
-import Groups from "./pages/Groups.jsx";
-import Payments from "./pages/Payments.jsx";
-import Rooms from "./pages/Rooms.jsx";
-import Settings from "./pages/Settings.jsx";
-import AuthGate from "./components/AuthGate.jsx";
-import { useAuth } from "./auth/useAuth.js";
+import Layout from "./components/layout.jsx";
+import Dashboard from "./pages/dashboard.jsx";
+import Students from "./pages/students.jsx";
+import Teachers from "./pages/teachers.jsx";
+import Courses from "./pages/courses.jsx";
+import Groups from "./pages/groups.jsx";
+import Payments from "./pages/payments.jsx";
+import Rooms from "./pages/rooms.jsx";
+import Settings from "./pages/settings.jsx";
+import AuthGate from "./components/authgate.jsx";
+import { useAuth } from "./auth/useauth.js";
 
 function ProtectedPage({ access, children }) {
   const { hasAccess } = useAuth();
