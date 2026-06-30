@@ -10,6 +10,7 @@ const paymentRoutes = require("./routes/paymentroutes");
 const roomRoutes = require("./routes/roomroutes");
 const authRoutes = require("./routes/authroutes");
 const requireAuthorization = require("./middleware/auth");
+const { apiRateLimiter } = require("./middleware/rateLimit");
 require("./models/associations");
 
 const app = express();
@@ -24,6 +25,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/auth", authRoutes);
+app.use("/api", apiRateLimiter);
 app.use("/api", requireAuthorization);
 
 app.use("/api/teachers", teacherRoutes);

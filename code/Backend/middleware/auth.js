@@ -3,21 +3,40 @@ const AuthUser = require("../models/authusermodel");
 const Access = require("../models/accessmodel");
 const UserAccess = require("../models/useraccessmodel");
 
-const DEFAULT_JWT_EXPIRES_IN = "8h";
+const DEFAULT_ACCESS_TOKEN_EXPIRES_IN = "10m";
+const DEFAULT_REFRESH_TOKEN_EXPIRES_IN = "7d";
 
 function getJwtSecret() {
   return process.env.JWT_SECRET || "development-only-change-me";
 }
 
-function createSessionToken(user) {
+function getRefreshJwtSecret() {
+  return process.env.JWT_REFRESH_SECRET || getJwtSecret();
+}
+
+function createAccessToken(user) {
   return jwt.sign(
     {
       sub: user.id,
       role: user.role,
+      type: "access",
     },
     getJwtSecret(),
     {
-      expiresIn: process.env.JWT_EXPIRES_IN || DEFAULT_JWT_EXPIRES_IN,
+      expiresIn: process.env.JWT_ACCESS_EXPIRES_IN || DEFAULT_ACCESS_TOKEN_EXPIRES_IN,
+    }
+  );
+}
+
+function createRefreshToken(user) {
+  return jwt.sign(
+    {
+      sub: user.id,
+      type: "refresh",
+    },
+    getRefreshJwtSecret(),
+    {
+      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || DEFAULT_REFRESH_TOKEN_EXPIRES_IN,
     }
   );
 }
@@ -53,6 +72,12 @@ async function requireAuthorization(req, res, next) {
 
   try {
     const payload = jwt.verify(token, getJwtSecret());
+    if (payload.type && payload.type !== "access") {
+      return res.status(401).json({
+        error: "Token yaroqsiz yoki muddati tugagan",
+      });
+    }
+
     const user = await loadUserWithAccesses(payload.sub);
 
     if (!user || user.status !== "active") {
@@ -77,6 +102,9 @@ async function requireAuthorization(req, res, next) {
   }
 }
 
-requireAuthorization.createSessionToken = createSessionToken;
+requireAuthorization.createAccessToken = createAccessToken;
+requireAuthorization.createRefreshToken = createRefreshToken;
+requireAuthorization.getRefreshJwtSecret = getRefreshJwtSecret;
+requireAuthorization.loadUserWithAccesses = loadUserWithAccesses;
 
 module.exports = requireAuthorization;

@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { AuthContext } from "./authcontext.js";
 import {
+  AUTH_REFRESH_TOKEN_STORAGE_KEY,
   AUTH_TOKEN_STORAGE_KEY,
   AUTH_LAST_LOGIN_STORAGE_KEY,
   AUTH_USER_STORAGE_KEY,
   getCurrentUser,
   login as apiLogin,
+  logout as apiLogout,
 } from "../services/api.js";
 
 function readStoredUser() {
@@ -29,6 +31,7 @@ export function AuthProvider({ children }) {
       .then(setUser)
       .catch(() => {
         sessionStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+        sessionStorage.removeItem(AUTH_REFRESH_TOKEN_STORAGE_KEY);
         sessionStorage.removeItem(AUTH_USER_STORAGE_KEY);
         setUser(null);
       });
@@ -40,8 +43,10 @@ export function AuthProvider({ children }) {
     return body;
   }
 
-  function signOut() {
+  async function signOut() {
+    await apiLogout().catch(() => {});
     sessionStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+    sessionStorage.removeItem(AUTH_REFRESH_TOKEN_STORAGE_KEY);
     sessionStorage.removeItem(AUTH_USER_STORAGE_KEY);
     sessionStorage.removeItem(AUTH_LAST_LOGIN_STORAGE_KEY);
     setUser(null);

@@ -4,6 +4,7 @@ const API_ORIGIN = "http://localhost:5000";
 const BASE_URL = `${API_ORIGIN}/api`;
 const AUTH_URL = `${API_ORIGIN}/auth`;
 export const AUTH_TOKEN_STORAGE_KEY = "edu_center_api_token";
+export const AUTH_REFRESH_TOKEN_STORAGE_KEY = "edu_center_refresh_token";
 export const AUTH_USER_STORAGE_KEY = "edu_center_auth_user";
 export const AUTH_LAST_LOGIN_STORAGE_KEY = "edu_center_last_login_at";
 
@@ -22,10 +23,27 @@ export async function login(credentials) {
     throw new Error(body.error || `API ${res.status}: ${res.statusText}`);
   }
 
-  sessionStorage.setItem(AUTH_TOKEN_STORAGE_KEY, body.token);
+  sessionStorage.setItem(AUTH_TOKEN_STORAGE_KEY, body.accessToken || body.token);
+  sessionStorage.setItem(AUTH_REFRESH_TOKEN_STORAGE_KEY, body.refreshToken);
   sessionStorage.setItem(AUTH_USER_STORAGE_KEY, JSON.stringify(body.user));
   sessionStorage.setItem(AUTH_LAST_LOGIN_STORAGE_KEY, new Date().toISOString());
   return body;
+}
+
+export async function logout() {
+  const refreshToken = sessionStorage.getItem(AUTH_REFRESH_TOKEN_STORAGE_KEY);
+
+  if (!refreshToken) {
+    return;
+  }
+
+  await fetch(`${API_ORIGIN}/auth/logout`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ refreshToken }),
+  });
 }
 
 export async function getCurrentUser() {

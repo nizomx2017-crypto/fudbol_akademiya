@@ -1,6 +1,7 @@
 const { after, before, describe, it } = require("node:test");
 const assert = require("node:assert/strict");
 const { Client } = require("pg");
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const LOGIN_ACCOUNTS = [
@@ -16,6 +17,9 @@ process.env.LOGIN_ROLE_1 = "ADMIN";
 process.env.LOGIN_USER_2 = LOGIN_ACCOUNTS[1].login;
 process.env.LOGIN_PASSWORD_2 = LOGIN_ACCOUNTS[1].password;
 process.env.LOGIN_ROLE_2 = "DIRECTOR";
+process.env.LOGIN_RATE_LIMIT_MAX = "100";
+process.env.REGISTER_RATE_LIMIT_MAX = "100";
+process.env.API_RATE_LIMIT_MAX = "1000";
 
 let db;
 let server;
@@ -131,7 +135,7 @@ before(async () => {
   baseUrl = `http://127.0.0.1:${port}`;
 
   const loginBody = await login(LOGIN_ACCOUNTS[0]);
-  authToken = loginBody.token;
+  authToken = loginBody.accessToken;
 });
 
 after(async () => {
@@ -176,9 +180,14 @@ describe("Backend API smoke tests", () => {
   it("returns API token after successful login", async () => {
     const body = await login(LOGIN_ACCOUNTS[0]);
 
-    assert.equal(typeof body.token, "string");
-    assert.equal(body.token.split(".").length, 3);
-    assert.notEqual(body.token, LOGIN_ACCOUNTS[0].password);
+    assert.equal(typeof body.accessToken, "string");
+    assert.equal(typeof body.refreshToken, "string");
+    assert.equal(body.accessToken.split(".").length, 3);
+    assert.equal(body.refreshToken.split(".").length, 3);
+    assert.equal(body.token, body.accessToken);
+    assert.notEqual(body.accessToken, LOGIN_ACCOUNTS[0].password);
+    assert.equal(jwt.decode(body.accessToken).exp - jwt.decode(body.accessToken).iat, 10 * 60);
+    assert.equal(jwt.decode(body.refreshToken).exp - jwt.decode(body.refreshToken).iat, 7 * 24 * 60 * 60);
     assert.equal(body.user.login, LOGIN_ACCOUNTS[0].login);
     assert.equal(body.user.role, "ADMIN");
   });
@@ -186,11 +195,52 @@ describe("Backend API smoke tests", () => {
   it("returns API token for DIRECTOR account", async () => {
     const body = await login(LOGIN_ACCOUNTS[1]);
 
-    assert.equal(typeof body.token, "string");
-    assert.equal(body.token.split(".").length, 3);
-    assert.notEqual(body.token, LOGIN_ACCOUNTS[1].password);
+    assert.equal(typeof body.accessToken, "string");
+    assert.equal(typeof body.refreshToken, "string");
+    assert.equal(body.accessToken.split(".").length, 3);
+    assert.notEqual(body.accessToken, LOGIN_ACCOUNTS[1].password);
     assert.equal(body.user.login, LOGIN_ACCOUNTS[1].login);
     assert.equal(body.user.role, "DIRECTOR");
+  });
+
+  it("refreshes access token and clears refresh token on logout", async () => {
+    const loginBody = await login(LOGIN_ACCOUNTS[0]);
+
+    const refreshResponse = await fetch(`${baseUrl}/auth/refresh`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ refreshToken: loginBody.refreshToken }),
+    });
+    const refreshBody = await refreshResponse.json();
+
+    assert.equal(refreshResponse.status, 200);
+    assert.equal(typeof refreshBody.accessToken, "string");
+    assert.equal(typeof refreshBody.refreshToken, "string");
+    assert.equal(refreshBody.token, refreshBody.accessToken);
+
+    const logoutResponse = await fetch(`${baseUrl}/auth/logout`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ refreshToken: refreshBody.refreshToken }),
+    });
+    const logoutBody = await logoutResponse.json();
+
+    assert.equal(logoutResponse.status, 200);
+    assert.equal(logoutBody.message, "Logged out");
+
+    const afterLogoutResponse = await fetch(`${baseUrl}/auth/refresh`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ refreshToken: refreshBody.refreshToken }),
+    });
+
+    assert.equal(afterLogoutResponse.status, 401);
   });
 
   it("supports auth user management with roles and without exposing password hashes", async () => {
@@ -250,7 +300,7 @@ describe("Backend API smoke tests", () => {
   it("allows DIRECTOR full access without assigned permissions", async () => {
     const directorLogin = await login(LOGIN_ACCOUNTS[1]);
     const courses = await request("/api/courses", {
-      token: directorLogin.token,
+      token: directorLogin.accessToken,
     });
 
     assert.ok(Array.isArray(courses));
@@ -270,7 +320,7 @@ describe("Backend API smoke tests", () => {
 
     const deniedResponse = await fetch(`${baseUrl}/api/students`, {
       headers: {
-        Authorization: `Bearer ${managerLogin.token}`,
+        Authorization: `Bearer ${managerLogin.accessToken}`,
       },
     });
     const deniedBody = await deniedResponse.json();
@@ -288,13 +338,13 @@ describe("Backend API smoke tests", () => {
     assert.deepEqual(updated.accesses.sort(), ["students:create", "students:view"]);
 
     const allowedStudents = await request("/api/students", {
-      token: managerLogin.token,
+      token: managerLogin.accessToken,
     });
     assert.equal(allowedStudents.total, 0);
 
     const stillDeniedResponse = await fetch(`${baseUrl}/api/teachers`, {
       headers: {
-        Authorization: `Bearer ${managerLogin.token}`,
+        Authorization: `Bearer ${managerLogin.accessToken}`,
       },
     });
     assert.equal(stillDeniedResponse.status, 403);
@@ -322,7 +372,7 @@ describe("Backend API smoke tests", () => {
       ["courses:view", "dashboard:view", "groups:view", "students:view", "teachers:view"].sort()
     );
     const teacherCourses = await request("/api/courses", {
-      token: teacherLogin.token,
+      token: teacherLogin.accessToken,
     });
     assert.ok(Array.isArray(teacherCourses));
 
@@ -330,7 +380,7 @@ describe("Backend API smoke tests", () => {
       method: "POST",
       headers: {
         "content-type": "application/json",
-        Authorization: `Bearer ${teacherLogin.token}`,
+        Authorization: `Bearer ${teacherLogin.accessToken}`,
       },
       body: JSON.stringify({
         name: "Blocked Course",

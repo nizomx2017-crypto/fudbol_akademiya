@@ -19,6 +19,11 @@ const AuthUser = db.define("auth_users", {
     allowNull: false,
   },
 
+  refreshTokenHash: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+
   role: {
     type: DataTypes.ENUM("ADMIN", "DIRECTOR", "MANAGER", "TEACHER", "STUDENT"),
     allowNull: false,
