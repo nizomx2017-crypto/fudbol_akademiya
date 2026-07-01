@@ -20,6 +20,7 @@ process.env.LOGIN_ROLE_2 = "DIRECTOR";
 process.env.LOGIN_RATE_LIMIT_MAX = "100";
 process.env.REGISTER_RATE_LIMIT_MAX = "100";
 process.env.API_RATE_LIMIT_MAX = "1000";
+process.env.DISABLE_RECAPTCHA = "true";
 
 let db;
 let server;
@@ -174,7 +175,30 @@ describe("Backend API smoke tests", () => {
     const body = await response.json();
 
     assert.equal(response.status, 401);
-    assert.equal(body.error, "Login yoki parol xato");
+    assert.equal(body.error, "Login yoki parol noto'g'ri");
+  });
+
+  it("requires captcha for login in production", async () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    const originalDisableRecaptcha = process.env.DISABLE_RECAPTCHA;
+
+    process.env.NODE_ENV = "production";
+    process.env.DISABLE_RECAPTCHA = "true";
+
+    const response = await fetch(`${baseUrl}/auth/login`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(LOGIN_ACCOUNTS[0]),
+    });
+    const body = await response.json();
+
+    process.env.NODE_ENV = originalNodeEnv;
+    process.env.DISABLE_RECAPTCHA = originalDisableRecaptcha;
+
+    assert.equal(response.status, 400);
+    assert.equal(body.error, "Captcha tekshiruvidan o'tmadi");
   });
 
   it("returns API token after successful login", async () => {
@@ -294,6 +318,115 @@ describe("Backend API smoke tests", () => {
     assert.equal(oldPasswordResponse.status, 401);
 
     const deleted = await deleteRecord(`/auth/users/${created.id}`);
+    assert.equal(deleted.message, "Auth user deleted");
+  });
+
+  it("validates auth user creation payloads and blocks duplicate logins", async () => {
+    const invalidResponse = await fetch(`${baseUrl}/auth/users`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+      body: JSON.stringify({
+        login: "",
+        password: "short",
+        role: "OWNER",
+        status: "pending",
+        accesses: "students:view",
+      }),
+    });
+    const invalidBody = await invalidResponse.json();
+
+    assert.equal(invalidResponse.status, 400);
+    assert.equal(invalidBody.error, "Validation xato");
+    assert.ok(invalidBody.details.includes("Login kiritilishi kerak"));
+    assert.ok(invalidBody.details.includes("Parol kamida 8 ta belgidan iborat bo'lishi kerak"));
+    assert.ok(invalidBody.details.includes("Role noto'g'ri"));
+    assert.ok(invalidBody.details.includes("Status noto'g'ri"));
+    assert.ok(invalidBody.details.includes("Accesses array bo'lishi kerak"));
+
+    const duplicateResponse = await fetch(`${baseUrl}/auth/users`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+      body: JSON.stringify({
+        login: LOGIN_ACCOUNTS[0].login,
+        password: "valid-password",
+        role: "MANAGER",
+      }),
+    });
+    const duplicateBody = await duplicateResponse.json();
+
+    assert.equal(duplicateResponse.status, 400);
+    assert.equal(duplicateBody.error, "Bunday login allaqachon mavjud");
+  });
+
+  it("locks a login after repeated wrong passwords and resets attempts after success", async () => {
+    const user = await createRecord("/auth/users", {
+      login: "brute-force-user",
+      password: "safe-password",
+      role: "MANAGER",
+    });
+
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const response = await fetch(`${baseUrl}/auth/login`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          login: "brute-force-user",
+          password: "wrong-password",
+        }),
+      });
+      const body = await response.json();
+
+      assert.equal(response.status, 401);
+      assert.equal(body.error, "Login yoki parol noto'g'ri");
+    }
+
+    const successfulLogin = await login({
+      login: "brute-force-user",
+      password: "safe-password",
+    });
+    assert.equal(successfulLogin.user.login, "brute-force-user");
+
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      const response = await fetch(`${baseUrl}/auth/login`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          login: "brute-force-user",
+          password: "wrong-password",
+        }),
+      });
+      const body = await response.json();
+
+      assert.equal(response.status, 401);
+      assert.equal(body.error, "Login yoki parol noto'g'ri");
+    }
+
+    const lockedResponse = await fetch(`${baseUrl}/auth/login`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        login: "brute-force-user",
+        password: "wrong-password",
+      }),
+    });
+    const lockedBody = await lockedResponse.json();
+
+    assert.equal(lockedResponse.status, 423);
+    assert.match(lockedBody.error, /bloklangan/);
+
+    const deleted = await deleteRecord(`/auth/users/${user.id}`);
     assert.equal(deleted.message, "Auth user deleted");
   });
 

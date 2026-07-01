@@ -140,6 +140,15 @@ input, select, textarea { font-family: inherit; }
   height: 42px;
 }
 
+.auth-captcha {
+  min-height: 78px;
+}
+
+.auth-captcha.is-disabled {
+  opacity: 0.65;
+  pointer-events: none;
+}
+
 /* ============ LAYOUT ============ */
 .app {
   display: flex;
