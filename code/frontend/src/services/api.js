@@ -1,6 +1,6 @@
 
 // All functions return Promises and follow REST conventions.
-const API_ORIGIN = "http://localhost:5000";
+const API_ORIGIN = import.meta.env.VITE_API_URL || "https://api.chorshanba.uz";
 const BASE_URL = `${API_ORIGIN}/api`;
 const AUTH_URL = `${API_ORIGIN}/auth`;
 export const AUTH_TOKEN_STORAGE_KEY = "edu_center_api_token";
