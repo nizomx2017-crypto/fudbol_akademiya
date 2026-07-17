@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useAuth } from "../auth/useauth.js";
+import { useAuth } from "../auth/useAuth.js";
 
 const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
 const IS_RECAPTCHA_DISABLED =

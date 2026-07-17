@@ -1,4 +1,4 @@
-import CrudPage from "../components/crudpage.jsx";
+import CrudPage from "../components/CrudPage.jsx";
 import { teachersApi } from "../services/api.js";
 
 export default function Teachers() {

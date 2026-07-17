@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Bell, LogOut, Menu, Search, ShieldCheck, Sun, UserRound } from "lucide-react";
-import { useAuth } from "../auth/useauth.js";
+import { useAuth } from "../auth/useAuth.js";
 import { AUTH_TOKEN_STORAGE_KEY } from "../services/api.js";
 
 export default function Navbar({ onMenu }) {
