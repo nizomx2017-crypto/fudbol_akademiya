@@ -5,6 +5,24 @@ on:
     branches:
       - master
   workflow_dispatch:
+    inputs:
+      environment:
+        description: Deployment environment
+        required: true
+        default: prod
+        type: choice
+        options:
+          - prod
+          - test
+      service:
+        description: Service to build and deploy
+        required: true
+        default: all
+        type: choice
+        options:
+          - fe
+          - be
+          - all
 
 permissions:
   contents: read
@@ -19,10 +37,12 @@ jobs:
       matrix:
         include:
           - service: frontend
+            short_name: fe
             context: ./code/frontend
             dockerfile: ./code/frontend/Dockerfile
             image: ghcr.io/${{ github.repository_owner }}/oquv-markazi-frontend:latest
           - service: backend
+            short_name: be
             context: ./code/Backend
             dockerfile: ./code/Backend/Dockerfile
             image: ghcr.io/${{ github.repository_owner }}/oquv-markazi-backend:latest
@@ -42,7 +62,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push frontend image
-        if: matrix.service == 'frontend'
+        if: >-
+          matrix.service == 'frontend' &&
+          (github.event_name == 'push' || inputs.service == 'all' || inputs.service == matrix.short_name)
         uses: docker/build-push-action@v7
         with:
           context: ${{ matrix.context }}
@@ -56,7 +78,9 @@ jobs:
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}
 
       - name: Build and push backend image
-        if: matrix.service == 'backend'
+        if: >-
+          matrix.service == 'backend' &&
+          (github.event_name == 'push' || inputs.service == 'all' || inputs.service == matrix.short_name)
         uses: docker/build-push-action@v7
         with:
           context: ${{ matrix.context }}
@@ -77,6 +101,8 @@ jobs:
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
           VPS_SSH_KEY_B64: ${{ secrets.VPS_SSH_KEY_B64 }}
+          DEPLOY_ENVIRONMENT: ${{ github.event_name == 'push' && 'prod' || inputs.environment }}
+          DEPLOY_SERVICE: ${{ github.event_name == 'push' && 'all' || inputs.service }}
         run: |
           set -euo pipefail
 
@@ -94,42 +120,67 @@ jobs:
             -i "$HOME/.ssh/id_ed25519" \
             -o BatchMode=yes \
             -o IdentitiesOnly=yes \
-            "$VPS_USER@$VPS_HOST" 'bash -se' <<'REMOTE_SCRIPT'
+            "$VPS_USER@$VPS_HOST" \
+            "DEPLOY_ENVIRONMENT='$DEPLOY_ENVIRONMENT' DEPLOY_SERVICE='$DEPLOY_SERVICE' bash -se" <<'REMOTE_SCRIPT'
           set -euo pipefail
 
           frontend_image="ghcr.io/nizomx2017-crypto/oquv-markazi-frontend:latest"
           backend_image="ghcr.io/nizomx2017-crypto/oquv-markazi-backend:latest"
 
-          test -f /opt/oquv-markazi/backend.env
-          docker network inspect oquv-network > /dev/null
-          docker pull "$frontend_image"
-          docker pull "$backend_image"
+          case "$DEPLOY_ENVIRONMENT" in
+            prod)
+              frontend_container="ghcr-frontend"
+              frontend_port="8081"
+              backend_container="ghcr-backend"
+              backend_port="5051"
+              ;;
+            test)
+              frontend_container="test-frontend"
+              frontend_port="8082"
+              backend_container="test-backend"
+              backend_port="5052"
+              ;;
+            *)
+              echo "Unsupported environment: $DEPLOY_ENVIRONMENT" >&2
+              exit 1
+              ;;
+          esac
 
-          if docker container inspect ghcr-backend > /dev/null 2>&1; then
-            docker rm -f ghcr-backend
+          if [[ "$DEPLOY_SERVICE" == "be" || "$DEPLOY_SERVICE" == "all" ]]; then
+            test -f /opt/oquv-markazi/backend.env
+            docker network inspect oquv-network > /dev/null
+            docker pull "$backend_image"
+
+            if docker container inspect "$backend_container" > /dev/null 2>&1; then
+              docker rm -f "$backend_container"
+            fi
+
+            docker run -d \
+              --name "$backend_container" \
+              --env-file /opt/oquv-markazi/backend.env \
+              --network oquv-network \
+              -p "$backend_port:5000" \
+              --restart unless-stopped \
+              "$backend_image"
           fi
 
-          docker run -d \
-            --name ghcr-backend \
-            --env-file /opt/oquv-markazi/backend.env \
-            --network oquv-network \
-            -p 5051:5000 \
-            --restart unless-stopped \
-            "$backend_image"
+          if [[ "$DEPLOY_SERVICE" == "fe" || "$DEPLOY_SERVICE" == "all" ]]; then
+            docker pull "$frontend_image"
 
-          if docker container inspect ghcr-frontend > /dev/null 2>&1; then
-            docker rm -f ghcr-frontend
+            if docker container inspect "$frontend_container" > /dev/null 2>&1; then
+              docker rm -f "$frontend_container"
+            fi
+
+            docker run -d \
+              --name "$frontend_container" \
+              --network oquv-network \
+              -p "$frontend_port:80" \
+              --restart unless-stopped \
+              "$frontend_image"
           fi
-
-          docker run -d \
-            --name ghcr-frontend \
-            --network oquv-network \
-            -p 8081:80 \
-            --restart unless-stopped \
-            "$frontend_image"
 
           docker ps \
-            --filter 'name=^/ghcr-backend$' \
-            --filter 'name=^/ghcr-frontend$' \
+            --filter "name=^/$backend_container$" \
+            --filter "name=^/$frontend_container$" \
             --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'
           REMOTE_SCRIPT
