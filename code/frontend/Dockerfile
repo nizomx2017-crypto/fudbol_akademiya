@@ -6,7 +6,12 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
-RUN npm run build
+ARG VITE_DISABLE_RECAPTCHA=false
+ARG VITE_BUILD_MODE=production
+ARG NODE_ENV=production
+ENV VITE_DISABLE_RECAPTCHA=${VITE_DISABLE_RECAPTCHA}
+ENV NODE_ENV=${NODE_ENV}
+RUN npm run build -- --mode ${VITE_BUILD_MODE}
 
 FROM nginx:1.27-alpine
 
