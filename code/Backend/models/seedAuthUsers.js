@@ -1,8 +1,8 @@
-const AuthUser = require("./authusermodel");
-const Role = require("./rolemodel");
-const Access = require("./accessmodel");
+const AuthUser = require("./AuthUserModel");
+const Role = require("./RoleModel");
+const Access = require("./AccessModel");
 const { hashPassword } = require("../utils/password");
-const { ACCESS_CATALOG } = require("../constants/accesscatalog");
+const { ACCESS_CATALOG } = require("../constants/accessCatalog");
 
 const ROLES = ["ADMIN", "DIRECTOR", "MANAGER", "TEACHER", "STUDENT"];
 

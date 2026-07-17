@@ -123,7 +123,7 @@ before(async () => {
   await ensureTestDatabase();
 
   const app = require("../app");
-  const seedAuthUsers = require("../models/seedauthusers");
+  const seedAuthUsers = require("../models/seedAuthUsers");
   db = require("../config/db");
 
   await db.sync({ force: true });

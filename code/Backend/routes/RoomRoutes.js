@@ -7,7 +7,7 @@ const {
     createRoom,
     updateRoom,
     deleteRoom
-} = require("../controller/roomcontroller");
+} = require("../controller/RoomController");
 
 router.get("/", requireAccess("rooms:view"), getRooms);
 

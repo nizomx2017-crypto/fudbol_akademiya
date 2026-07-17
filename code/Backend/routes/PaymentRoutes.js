@@ -7,7 +7,7 @@ const {
     createPayment,
     updatePayment,
     deletePayment
-} = require("../controller/paymentcontroller");
+} = require("../controller/PaymentController");
 
 router.get("/", requireAccess("payments:view"), getPayments);
 

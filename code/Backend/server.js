@@ -1,6 +1,6 @@
 const app = require("./app");
 const db = require("./config/db");
-const seedAuthUsers = require("./models/seedauthusers");
+const seedAuthUsers = require("./models/seedAuthUsers");
 
 const PORT = process.env.PORT || 5000;
 const forceSync = process.env.DB_FORCE_SYNC === "true";
