@@ -23,8 +23,8 @@ jobs:
             dockerfile: ./code/frontend/Dockerfile
             image: ghcr.io/${{ github.repository_owner }}/oquv-markazi-frontend:latest
           - service: backend
-            context: ./code/backend
-            dockerfile: ./code/backend/Dockerfile
+            context: ./code/Backend
+            dockerfile: ./code/Backend/Dockerfile
             image: ghcr.io/${{ github.repository_owner }}/oquv-markazi-backend:latest
 
     steps:
