@@ -1,39 +1,23 @@
-# O'quv Markazi - AI Agent Guidelines
+# O‘quv Markazi repository qo‘llanmasi
 
-## Project Goal
-Yosh talabalarning o'qishini to'liq avtomatlashtiruvchi boshqaruv tizimi yaratish.
+## Tuzilma
 
-## Directory Structure Purpose
+- `code/backend`: Node.js/Express/Sequelize modular monolith.
+- `code/backend/modules/<name>`: router, controller, service, repository, model, DTO, test va README.
+- `code/frontend`: React/Vite ilova.
+- `docs`: arxitektura va reja; `vazifalar`: ish tracking.
 
-### `/docs/`
-- **Purpose**: Hujjatlashtirish va rejalashtirish
-- **Content**: Konsepsiya, arxitektura, user rollari, MVP reja
-- **Maintenance**: Har bir o'zgarishda yangilanish
+## Buyruqlar
 
-### `/code/`
-- **Purpose**: Dastur kodlari
-- **Backend**: `backend/` - Node.js API server
-- **Frontend**: `frontend/` - React web ilova
-- **Mobile**: `mobile/` - React Native ilova
-- **Shared**: `shared/` - Umumiy tip va utils
+- Backend test/check: `npm.cmd --prefix code/backend test`, `npm.cmd --prefix code/backend run check`.
+- Frontend: `npm.cmd --prefix code/frontend run lint`, `npm.cmd --prefix code/frontend run build`.
+- DB: `npm.cmd --prefix code/backend run migrate`, `npm.cmd --prefix code/backend run seed`.
+- Stack: `docker compose up --build`; config tekshiruv: `docker compose config`.
 
-### `/vazifalar/`
-- **Purpose**: Task management va tracking
-- **backlog/** - Bajarilishi kerak bo'lgan vazifalar
-- **in-progress/** - Hozirgi vazifalar
-- **done/** - Tugallangan vazifalar
-- **_template.md** - Standart vazifa forma
+## Standartlar
 
-- tartib bilan ishlagin
-- 
+Lowercase papka/import nomlari; controller’da biznes logika yo‘q; service modul public interface’i; repository DB’ni boshqaradi. Request DTO validationdan o‘tadi. Pul uchun DECIMAL ishlatiladi. Token, parol va shaxsiy ma’lumot log qilinmaydi. `.env` commit qilinmaydi. Modul ichki faylini boshqa modul to‘g‘ridan-to‘g‘ri import qilmaydi.
 
-### `/skills/`
-- **Purpose**: Skill assessment va tracking
-- **Content**: Baholash mezonlari, progress tracking
+## Done mezoni
 
-### `/tahlil/`
-- **Purpose**: Data analysis va reporting
-- **Content**: Statistikalar, hisobotlar, benchishlarni 
-
-senior dasturchi sifatida bajaring
-
+Kod real endpoint va persistence’ga ega; migration/seed yangilangan; auth va xato holatlari testlangan; backend test/check, frontend lint/build va Docker config o‘tgan; README/OpenAPI yangilangan; mavjud funksiyalar regressiyasiz.

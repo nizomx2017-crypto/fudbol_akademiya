@@ -24,7 +24,7 @@ const Student = db.define("students", {
   },
 
   balance: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.DECIMAL(18, 2),
     allowNull: true,
   },
 

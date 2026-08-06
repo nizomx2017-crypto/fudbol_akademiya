@@ -1,0 +1,2 @@
+const { DataTypes } = require("sequelize"); const db = require("../../config/db");
+module.exports = db.define("notifications", { id:{type:DataTypes.INTEGER,primaryKey:true,autoIncrement:true}, userId:{type:DataTypes.INTEGER,allowNull:false}, title:{type:DataTypes.STRING,allowNull:false}, body:{type:DataTypes.TEXT,allowNull:false}, channel:{type:DataTypes.STRING,defaultValue:"in_app"}, readAt:DataTypes.DATE });

@@ -1,0 +1,1 @@
+const User=require("./model");module.exports={findById:id=>User.findByPk(id,{attributes:{exclude:["passwordHash","refreshTokenHash"]}}),list:()=>User.findAll({attributes:{exclude:["passwordHash","refreshTokenHash"]}})};

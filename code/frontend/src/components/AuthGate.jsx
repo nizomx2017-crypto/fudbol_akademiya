@@ -113,11 +113,12 @@ export default function AuthGate({ children }) {
 
 function RecaptchaBox({ siteKey, disabled, onVerify, onExpire, widgetRef }) {
   const containerRef = useRef(null);
-  const [loadError, setLoadError] = useState("");
+  const [loadError, setLoadError] = useState(
+    siteKey ? "" : "reCAPTCHA site key topilmadi",
+  );
 
   useEffect(() => {
     if (!siteKey) {
-      setLoadError("reCAPTCHA site key topilmadi");
       return undefined;
     }
 

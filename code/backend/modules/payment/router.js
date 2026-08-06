@@ -1,0 +1,1 @@
+const r=require("express").Router(),c=require("./controller"),v=require("../../shared/validate").validate,d=require("./dto");r.get("/",c.list);r.post("/",v(d.create),c.create);r.get("/:id",c.get);r.post("/:id/cancel",c.cancel);module.exports={router:r,webhook:[v(d.webhook),c.webhook]};

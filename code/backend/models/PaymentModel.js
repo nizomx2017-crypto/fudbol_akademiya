@@ -14,7 +14,7 @@ const Payment = db.define("payments", {
   },
 
   amount: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.DECIMAL(18, 2),
     allowNull: false,
   },
 

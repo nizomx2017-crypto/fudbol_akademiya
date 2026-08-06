@@ -2,6 +2,7 @@ const { after, before, describe, it } = require("node:test");
 const assert = require("node:assert/strict");
 const { Client } = require("pg");
 const jwt = require("jsonwebtoken");
+process.env.NODE_ENV = "test";
 require("dotenv").config();
 
 const LOGIN_ACCOUNTS = [
@@ -679,5 +680,53 @@ describe("Backend API smoke tests", () => {
 
     const deleted = await deleteRecord(`/api/rooms/${room.id}`);
     assert.equal(deleted.message, "Room deleted");
+  });
+
+  it("exposes health, readiness and OpenAPI", async () => {
+    const health = await request("/ops/health");
+    assert.equal(health.status, "ok");
+    const ready = await request("/ops/ready");
+    assert.equal(ready.database, "up");
+    const spec = await request("/openapi.json");
+    assert.equal(spec.openapi, "3.0.3");
+  });
+
+  it("creates idempotent-key protected payment and returns history", async () => {
+    const missing = await fetch(`${baseUrl}/api/payments-v2`, { method: "POST", headers: { "content-type": "application/json", Authorization: `Bearer ${authToken}` }, body: JSON.stringify({ amount: 120000 }) });
+    assert.equal(missing.status, 400);
+    const payment = await request("/api/payments-v2", { method: "POST", headers: { "content-type": "application/json", "Idempotency-Key": "payment-test-1", Authorization: `Bearer ${authToken}` }, body: JSON.stringify({ amount: 120000 }) });
+    assert.equal(payment.status, "pending");
+    const history = await request("/api/payments-v2");
+    assert.equal(history.meta.total, 1);
+    const cancelled = await request(`/api/payments-v2/${payment.id}/cancel`, { method: "POST" });
+    assert.equal(cancelled.status, "cancelled");
+  });
+
+  it("uses atomic wallet transactions and prevents overdraft", async () => {
+    const credited = await request("/api/billing/wallet/transactions", { method: "POST", body: JSON.stringify({ amount: 50000, type: "credit", reference: "credit-1" }) });
+    assert.equal(Number(credited.wallet.balance), 50000);
+    const debit = await request("/api/billing/wallet/transactions", { method: "POST", body: JSON.stringify({ amount: 20000, type: "debit", reference: "debit-1" }) });
+    assert.equal(Number(debit.wallet.balance), 30000);
+    const denied = await fetch(`${baseUrl}/api/billing/wallet/transactions`, { method: "POST", headers: { "content-type": "application/json", Authorization: `Bearer ${authToken}` }, body: JSON.stringify({ amount: 999999, type: "debit" }) });
+    assert.equal(denied.status, 409);
+  });
+
+  it("supports chat, notifications, user profile and storage validation", async () => {
+    const conversation = await request("/api/chat", { method: "POST", body: JSON.stringify({ title: "Test" }) });
+    const message = await request(`/api/chat/${conversation.id}/messages`, { method: "POST", body: JSON.stringify({ body: "Salom" }) });
+    assert.equal(message.body, "Salom");
+    const notification = await request("/api/notifications", { method: "POST", body: JSON.stringify({ userId: 1, title: "Test", body: "Xabar" }) });
+    assert.equal(notification.title, "Test");
+    const me = await request("/api/users/me");
+    assert.equal(me.login, "admin");
+    const upload = await fetch(`${baseUrl}/api/storage`, { method: "POST", headers: { Authorization: `Bearer ${authToken}` } });
+    assert.equal(upload.status, 400);
+  });
+
+  it("rejects Telegram and payment webhooks without secrets", async () => {
+    const telegram = await fetch(`${baseUrl}/telegram/webhook`, { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
+    assert.equal(telegram.status, 401);
+    const payment = await fetch(`${baseUrl}/webhooks/payment`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ reference: "x", status: "paid" }) });
+    assert.equal(payment.status, 401);
   });
 });

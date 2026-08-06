@@ -1,0 +1,1 @@
+const r=require("express").Router(),c=require("./controller"),v=require("../../shared/validate").validate,d=require("./dto");r.get("/wallet",c.wallet);r.post("/wallet/transactions",v(d.adjust),c.adjust);r.get("/plans",c.plans);r.post("/subscriptions",v(d.subscription),c.subscribe);module.exports=r;

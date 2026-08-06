@@ -7,6 +7,7 @@ const DEFAULT_ACCESS_TOKEN_EXPIRES_IN = "10m";
 const DEFAULT_REFRESH_TOKEN_EXPIRES_IN = "7d";
 
 function getJwtSecret() {
+  if (!process.env.JWT_SECRET && process.env.NODE_ENV === "production") throw new Error("JWT_SECRET required");
   return process.env.JWT_SECRET || "development-only-change-me";
 }
 

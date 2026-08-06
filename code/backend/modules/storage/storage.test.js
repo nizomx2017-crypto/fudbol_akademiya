@@ -1,0 +1,1 @@
+const{test}=require("node:test"),assert=require("node:assert/strict");test("storage enforces size and mime allow-list",()=>{const d=require("./dto");assert.equal(d.maxSize,10485760);assert.ok(!d.allowedTypes.includes("text/html"))});

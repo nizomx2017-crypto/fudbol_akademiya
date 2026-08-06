@@ -4,6 +4,13 @@ const AuthUser = require("./AuthUserModel");
 const Role = require("./RoleModel");
 const Access = require("./AccessModel");
 const UserAccess = require("./UserAccessModel");
+require("../modules/payment/model");
+require("../modules/billing/model");
+require("../modules/storage/model");
+require("../modules/chat/model");
+require("../modules/tgbot/model");
+require("../modules/notification/model");
+require("../modules/ops/model");
 
 
 Course.hasMany(Student);

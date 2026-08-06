@@ -1,0 +1,1 @@
+require("dotenv").config();const db=require("../config/db");require("../models/associations");(async()=>{if(process.env.NODE_ENV==="production"&&process.env.DB_FORCE_SYNC==="true")throw new Error("Unsafe DB_FORCE_SYNC");await db.sync({alter:false});console.log("Migrations applied");await db.close()})().catch(e=>{console.error(e.message);process.exit(1)});

@@ -1,0 +1,1 @@
+const{DataTypes}=require("sequelize"),db=require("../../config/db");module.exports=db.define("telegram_links",{id:{type:DataTypes.INTEGER,primaryKey:true,autoIncrement:true},userId:{type:DataTypes.INTEGER,allowNull:false,unique:true},chatId:{type:DataTypes.STRING,allowNull:false,unique:true},linkTokenHash:DataTypes.STRING});

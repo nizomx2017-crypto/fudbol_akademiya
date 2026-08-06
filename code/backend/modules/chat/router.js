@@ -1,0 +1,1 @@
+const r=require("express").Router(),c=require("./controller"),v=require("../../shared/validate").validate,d=require("./dto"); r.get("/",c.list);r.post("/",v(d.conversation),c.create);r.post("/:id/messages",v(d.message),c.send);r.patch("/messages/:id/read",c.read);module.exports=r;

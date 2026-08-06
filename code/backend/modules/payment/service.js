@@ -1,0 +1,1 @@
+const r=require("./repository"),{AppError}=require("../../shared/errors");module.exports={create:async(data,userId,key)=>{if(!key)throw new AppError(400,"Idempotency-Key kerak","IDEMPOTENCY_KEY_REQUIRED");return r.create({...data,userId},key)},get:r.get,list:r.list,cancel:r.cancel,webhook:r.webhook};

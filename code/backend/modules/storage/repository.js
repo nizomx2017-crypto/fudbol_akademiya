@@ -1,0 +1,1 @@
+const M=require("./model");module.exports={create:d=>M.create(d),list:ownerId=>M.findAll({where:{ownerId}}),get:(id,ownerId)=>M.findOne({where:{id,ownerId}}),remove:(id,ownerId)=>M.destroy({where:{id,ownerId}})};
