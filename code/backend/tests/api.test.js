@@ -689,6 +689,12 @@ describe("Backend API smoke tests", () => {
     assert.equal(ready.database, "up");
     const spec = await request("/openapi.json");
     assert.equal(spec.openapi, "3.0.3");
+
+    const docsResponse = await fetch(`${baseUrl}/api-docs/`);
+    const docsHtml = await docsResponse.text();
+    assert.equal(docsResponse.status, 200);
+    assert.match(docsResponse.headers.get("content-type"), /text\/html/);
+    assert.match(docsHtml, /id="swagger-ui"/);
   });
 
   it("creates idempotent-key protected payment and returns history", async () => {
@@ -696,6 +702,10 @@ describe("Backend API smoke tests", () => {
     assert.equal(missing.status, 400);
     const payment = await request("/api/payments-v2", { method: "POST", headers: { "content-type": "application/json", "Idempotency-Key": "payment-test-1", Authorization: `Bearer ${authToken}` }, body: JSON.stringify({ amount: 120000 }) });
     assert.equal(payment.status, "pending");
+    const duplicateResponse = await fetch(`${baseUrl}/api/payments-v2`, { method: "POST", headers: { "content-type": "application/json", "Idempotency-Key": "payment-test-1", Authorization: `Bearer ${authToken}` }, body: JSON.stringify({ amount: 120000 }) });
+    const duplicate = await duplicateResponse.json();
+    assert.equal(duplicateResponse.status, 200);
+    assert.equal(duplicate.id, payment.id);
     const history = await request("/api/payments-v2");
     assert.equal(history.meta.total, 1);
     const cancelled = await request(`/api/payments-v2/${payment.id}/cancel`, { method: "POST" });
@@ -712,9 +722,26 @@ describe("Backend API smoke tests", () => {
   });
 
   it("supports chat, notifications, user profile and storage validation", async () => {
-    const conversation = await request("/api/chat", { method: "POST", body: JSON.stringify({ title: "Test" }) });
+    const conversation = await request("/api/chat", { method: "POST", body: JSON.stringify({ title: "Test", participantId: 2 }) });
     const message = await request(`/api/chat/${conversation.id}/messages`, { method: "POST", body: JSON.stringify({ body: "Salom" }) });
     assert.equal(message.body, "Salom");
+    const participantLogin = await login(LOGIN_ACCOUNTS[1]);
+    const participantView = await request(`/api/chat/${conversation.id}`, { token: participantLogin.accessToken });
+    assert.equal(participantView.id, conversation.id);
+    const readMessage = await request(`/api/chat/messages/${message.id}/read`, { method: "PATCH", body: "{}", token: participantLogin.accessToken });
+    assert.ok(readMessage.readAt);
+
+    const outsider = await createRecord("/auth/users", { login: "chat-outsider", password: "outsider-password", role: "STUDENT" });
+    const outsiderLogin = await login({ login: "chat-outsider", password: "outsider-password" });
+    for (const [path, method, body] of [
+      [`/api/chat/${conversation.id}`, "GET", undefined],
+      [`/api/chat/${conversation.id}/messages`, "POST", JSON.stringify({ body: "Blocked" })],
+      [`/api/chat/messages/${message.id}/read`, "PATCH", "{}"],
+    ]) {
+      const response = await fetch(`${baseUrl}${path}`, { method, headers: { "content-type": "application/json", Authorization: `Bearer ${outsiderLogin.accessToken}` }, body });
+      assert.equal(response.status, 403);
+    }
+    await deleteRecord(`/auth/users/${outsider.id}`);
     const notification = await request("/api/notifications", { method: "POST", body: JSON.stringify({ userId: 1, title: "Test", body: "Xabar" }) });
     assert.equal(notification.title, "Test");
     const me = await request("/api/users/me");

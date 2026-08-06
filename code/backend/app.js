@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
+const swaggerUi = require("swagger-ui-express");
+const openapi = require("./openapi");
 require("dotenv").config();
 
 const studentRoutes = require("./routes/Studentroutes");
@@ -32,7 +34,17 @@ app.get("/", (req, res) => {
 app.use("/ops", require("./modules/ops/router"));
 app.use("/telegram", require("./modules/tgbot/router"));
 app.post("/webhooks/payment", ...require("./modules/payment/router").webhook);
-app.get("/openapi.json", (req, res) => res.json(require("./openapi")));
+app.get("/openapi.json", (req, res) => res.json(openapi));
+app.use(
+  "/api-docs",
+  (req, res, next) => {
+    // Swagger UI inline assets require a dedicated CSP policy.
+    res.removeHeader("Content-Security-Policy");
+    next();
+  },
+  swaggerUi.serve,
+  swaggerUi.setup(openapi, { customSiteTitle: "O‘quv Markazi API Docs" })
+);
 
 app.use("/auth", authRoutes);
 app.use("/api", apiRateLimiter);

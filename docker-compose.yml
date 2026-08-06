@@ -69,6 +69,9 @@ services:
       CORS_ORIGINS: http://localhost:8080
       PAYMENT_WEBHOOK_SECRET: ${PAYMENT_WEBHOOK_SECRET:?PAYMENT_WEBHOOK_SECRET must be set}
       TELEGRAM_WEBHOOK_SECRET: ${TELEGRAM_WEBHOOK_SECRET:?TELEGRAM_WEBHOOK_SECRET must be set}
+      LOGIN_USER_1: ${LOGIN_USER_1:-demo_admin}
+      LOGIN_PASSWORD_1: ${LOGIN_PASSWORD_1:?LOGIN_PASSWORD_1 must be set}
+      LOGIN_ROLE_1: ${LOGIN_ROLE_1:-ADMIN}
     ports:
       - "5000:5000"
     depends_on:
