@@ -43,8 +43,8 @@ jobs:
             image: ghcr.io/${{ github.repository_owner }}/oquv-markazi-frontend:latest
           - service: backend
             short_name: be
-            context: ./code/Backend
-            dockerfile: ./code/Backend/Dockerfile
+            context: ./code/backend
+            dockerfile: ./code/backend/Dockerfile
             image: ghcr.io/${{ github.repository_owner }}/oquv-markazi-backend:latest
 
     steps:
@@ -94,8 +94,25 @@ jobs:
     name: Deploy GHCR images to VPS
     needs: publish
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
+      - name: Check VPS deployment configuration
+        id: vps-config
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY_B64: ${{ secrets.VPS_SSH_KEY_B64 }}
+        run: |
+          if [[ -n "$VPS_HOST" && -n "$VPS_USER" && -n "$VPS_SSH_KEY_B64" ]]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "VPS deployment skipped: required repository secrets are not configured."
+          fi
+
       - name: Deploy frontend and backend containers
+        if: steps.vps-config.outputs.available == 'true'
         shell: bash
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
@@ -184,3 +201,7 @@ jobs:
             --filter "name=^/$frontend_container$" \
             --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'
           REMOTE_SCRIPT
+
+      - name: Confirm safe deployment skip
+        if: steps.vps-config.outputs.available != 'true'
+        run: echo "Container images were published; VPS deployment was safely skipped."
